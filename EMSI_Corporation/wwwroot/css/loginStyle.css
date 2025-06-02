@@ -10,6 +10,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background: linear-gradient(180deg, #ffffff 0%, #ffffff 75%, #BC1C34 100%);
 }
 
 .container {
@@ -20,7 +21,6 @@ body {
 
 .panel-izquierdo {
     flex: 1;
-    background-color: white;
     display: flex;
     justify-content: center;
     align-items: center;
