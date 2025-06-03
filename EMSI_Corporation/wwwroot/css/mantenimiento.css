@@ -1,0 +1,65 @@
+﻿* {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.canvas-btns {
+    display: flex;
+    flex-direction: row;
+    gap: .5rem;
+}
+
+.canvas-btns > button {
+    width: 50%;
+    height: 3rem;
+    color: white;
+    border: 0;
+    border-radius: .5rem;
+    cursor: pointer;
+    transition: all 200ms ease;
+}
+
+.canvas-btns > button:hover {
+    filter: brightness(70%);
+    transition: all 200ms ease;
+}
+
+#canvas-clear {
+    background-color: #bd374b;
+}
+
+#canvas-save {
+    background-color: #5f8c5f;
+}
+
+.mantenimiento {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+    gap: 2em;
+}
+
+.sec-mant-servicio {
+    grid-area: 1 / 1 / span 2 / span 1;
+}
+
+.sec-mant-datos {
+    grid-area: 3 / 1 / span 4 / span 1;
+}
+
+.sec-mant-observaciones {
+    grid-area: 1 / 2 / span 3 / span 1;
+}
+
+.sec-mant-excel {
+    grid-area: 4 / 2 / span 3 / span 1;
+}
+
+canvas {
+    cursor: crosshair;
+}

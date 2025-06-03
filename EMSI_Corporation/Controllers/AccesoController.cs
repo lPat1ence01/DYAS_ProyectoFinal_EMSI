@@ -21,5 +21,11 @@ namespace EMSI_Corporation.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public IActionResult Mantenimiento()
+        {
+            return View();
+        }
     }
 }
