@@ -1,14 +1,21 @@
-﻿namespace EMSI_Corporation.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace EMSI_Corporation.Models
 {
     public class Usuario
     {
-        public int IdUsuario { get; set; }
-        public string Username { get; set; }
-        public string Password  { get; set; }
-        public string Rol {  get; set; }
+        [Key]
+        public int IdUsuario {  get; set; }
+        public string usuario { get; set; }
+        public string password {  get; set; }
 
-        public int TrabajadorID { get; set; }
+        public int IdEmpleado {  get; set; }
 
-        public Trabajador Trabajador { get; set; }
+        /* Relación con Empleado */
+        [ForeignKey("IdEmpleado")]
+        public Empleado empleado { get; set; }
+
+        public ICollection<User_Rol> UserRoles {  get; set; }
     }
 }

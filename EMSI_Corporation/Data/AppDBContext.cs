@@ -1,4 +1,4 @@
-﻿    using EMSI_Corporation.Models;
+﻿using EMSI_Corporation.Models;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -11,69 +11,96 @@ namespace EMSI_Corporation.Data
 
         }
 
-        DbSet<Persona> personas { get; set; }
-        DbSet<Cliente> clientes { get; set; }
-        DbSet<Trabajador> trabajador { get; set; }
-        DbSet<Usuario> usuarios { get; set; }
+        public DbSet<Empleado> empleados { get; set; }
+        public DbSet<Usuario> usuarios { get; set; }
+        public DbSet<User_Rol> UserRoles { get; set; }
+        public DbSet<Rol> Roles { get; set; }
+        public DbSet<Rol_Menu> RolMenus { get; set; }
+        public DbSet<Menu> Menus {  get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Persona>(tb =>
+            modelBuilder.Entity<Empleado>(tb =>
             {
-                // Persona
-                modelBuilder.Entity<Persona>(tb =>
-                {
-                    tb.HasKey(p => p.IdPersona);
-                    tb.Property(p => p.Nombres).HasMaxLength(100).IsRequired();
-                    tb.Property(p => p.Apellidos).HasMaxLength(100).IsRequired();
-                    tb.Property(p => p.NumCelular).HasMaxLength(20);
-                    tb.Property(p => p.Direccion).HasMaxLength(150);
-                    tb.Property(p => p.Correo).HasMaxLength(100);
-                    tb.Property(p => p.DNI).HasMaxLength(15);
-                });
-
-                // Cliente
-                modelBuilder.Entity<Cliente>(tb =>
-                {
-                    tb.HasKey(c => c.IdCliente);
-                    tb.Property(c => c.TipoCliente).HasMaxLength(50).IsRequired();
-                    tb.Property(c => c.RUC).HasMaxLength(15);
-                    tb.HasOne(c => c.persona)
-                        .WithOne(p => p.Cliente)
-                        .HasForeignKey<Cliente>(c => c.IdCliente);
-                });
-
-                // Trabajador
-                modelBuilder.Entity<Trabajador>(tb =>
-                {
-                    tb.HasKey(t => t.IdTrabajador);
-                    tb.Property(t => t.Cargo).HasMaxLength(50).IsRequired();
-                    tb.Property(t => t.Sueldo).HasColumnType("decimal(10,2)");
-                    tb.HasOne(t => t.Persona)
-                        .WithOne(p => p.Trabajador)
-                        .HasForeignKey<Trabajador>(t => t.IdTrabajador);
-                });
-
-                // Usuario
-                modelBuilder.Entity<Usuario>(tb =>
-                {
-                    tb.HasKey(u => u.IdUsuario);
-                    tb.Property(u => u.Username).HasMaxLength(50).IsRequired();
-                    tb.Property(u => u.Password).HasMaxLength(255).IsRequired();
-                    tb.Property(u => u.Rol).HasMaxLength(50).IsRequired();
-                    tb.HasOne(u => u.Trabajador)
-                        .WithMany()
-                        .HasForeignKey(u => u.TrabajadorID)
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-                // Opcional: cambiar los nombres de las tablas si lo deseas
-                modelBuilder.Entity<Persona>().ToTable("Persona");
-                modelBuilder.Entity<Cliente>().ToTable("Cliente");
-                modelBuilder.Entity<Trabajador>().ToTable("Trabajador");
-                modelBuilder.Entity<Usuario>().ToTable("Usuario");
+                tb.HasKey(e => e.IdEmpleado);
+                tb.Property(e => e.IdEmpleado).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(e => e.nomEmpleado).HasMaxLength(100).IsRequired();
+                tb.Property(e => e.apeEmpleado).HasMaxLength(100).IsRequired();
+                tb.Property(e => e.dni).HasMaxLength(8).IsRequired();
+                tb.Property(e => e.gmail).HasMaxLength(100).IsRequired();
+                tb.Property(e => e.numCelular).HasMaxLength(10).IsRequired();
             });
 
+            modelBuilder.Entity<Usuario>(tb =>
+            {
+                tb.HasKey(u => u.IdUsuario);
+                tb.Property(u => u.IdUsuario).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(u => u.usuario).HasMaxLength(100).IsRequired();
+                tb.Property(u => u.password).HasMaxLength(100).IsRequired();
+
+                tb.HasOne(u => u.empleado)
+                    .WithOne(e => e.usuario)
+                    .HasForeignKey<Usuario>(u => u.IdEmpleado)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<User_Rol>(tb =>
+            {
+                tb.HasKey(ur => new
+                {
+                    ur.IdUsuario,
+                    ur.IdRol
+                });
+
+                tb.HasOne(ur => ur.Usuario)
+                    .WithMany(u => u.UserRoles)
+                    .HasForeignKey(ur => ur.IdUsuario);
+
+                tb.HasOne(ur => ur.Rol)
+                    .WithMany(u => u.UserRoles)
+                    .HasForeignKey(ur => ur.IdRol);
+
+            });
+
+            modelBuilder.Entity<Rol>(tb =>
+            {
+                tb.HasKey(r => r.IdRol);
+                tb.Property(r => r.IdRol).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(r => r.nomRol).HasMaxLength(50).IsRequired();
+                tb.Property(r => r.Descripcion).HasMaxLength(250).IsRequired();
+            });
+
+            modelBuilder.Entity<Rol_Menu>(tb =>
+            {
+                tb.HasKey(ur => new
+                {
+                    ur.IdMenu,
+                    ur.IdRol
+                });
+
+                tb.HasOne(ur => ur.Rol)
+                    .WithMany(u => u.RolMenus)
+                    .HasForeignKey(ur => ur.IdRol);
+
+                tb.HasOne(ur => ur.Menu)
+                    .WithMany(u => u.RolMenus)
+                    .HasForeignKey(ur => ur.IdMenu);
+            });
+
+            modelBuilder.Entity<Menu>(tb =>
+            {
+                tb.HasKey(m => m.IdMenu);
+                tb.Property(m => m.IdMenu).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(m => m.nomMenu).HasMaxLength(50).IsRequired();
+                tb.Property(m => m.Url).HasMaxLength(250).IsRequired();
+            });
+
+            modelBuilder.Entity<Empleado>().ToTable("Empleado");
+            modelBuilder.Entity<Usuario>().ToTable("Usuario");
+            modelBuilder.Entity<User_Rol>().ToTable("User_Rol");
+            modelBuilder.Entity<Rol>().ToTable("Rol");
+            modelBuilder.Entity<Rol_Menu>().ToTable("Rol_Menu");
+            modelBuilder.Entity<Menu>().ToTable("Menu");
         }
     }
 }
