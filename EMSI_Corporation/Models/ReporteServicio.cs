@@ -1,0 +1,30 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace EMSI_Corporation.Models
+{
+    public class ReporteServicio
+    {
+        [Key]
+        public int IdReporte { get; set; }
+        public byte[] FirmaCliente { get; set; }
+        public string Observaciones { get; set; }
+        public byte[] ImgEvidencia { get; set; }
+
+        [ForeignKey("Cliente")]
+        public int Cliente_ID { get; set; }
+        public Cliente Cliente { get; set; }
+
+        [ForeignKey("ComprobanteServicio")]
+        public int Comprobante_ID { get; set; }
+        public ComprobanteServicio ComprobanteServicio { get; set; }
+
+        [ForeignKey("Mantenimiento")]
+        public int Mantenimiento_ID { get; set; }
+        public Mantenimiento Mantenimiento { get; set; }
+
+        [ForeignKey("Recarga")]
+        public int Recarga_ID { get; set; }
+        public Recarga Recarga { get; set; }
+    }
+}

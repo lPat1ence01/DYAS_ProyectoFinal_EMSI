@@ -16,7 +16,17 @@ namespace EMSI_Corporation.Data
         public DbSet<User_Rol> UserRoles { get; set; }
         public DbSet<Rol> Roles { get; set; }
         public DbSet<Rol_Menu> RolMenus { get; set; }
-        public DbSet<Menu> Menus {  get; set; }
+        public DbSet<Menu> Menus { get; set; }
+        public DbSet<Cliente> Clientes { get; set; }
+        public DbSet<Venta> Ventas { get; set; }
+        public DbSet<Comprobante> Comprobantes { get; set; }
+        public DbSet<Extintor> Extintores { get; set; }
+        public DbSet<ComprobanteServicio> ComprobantesServicio { get; set; }
+        public DbSet<VisitaTecnica> VisitasTecnicas { get; set; }
+        public DbSet<InformeTecnico> InformesTecnicos { get; set; }
+        public DbSet<Mantenimiento> Mantenimientos { get; set; }
+        public DbSet<Recarga> Recargas { get; set; }
+        public DbSet<ReporteServicio> ReportesServicio { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +103,174 @@ namespace EMSI_Corporation.Data
                 tb.Property(m => m.IdMenu).UseIdentityColumn().ValueGeneratedOnAdd();
                 tb.Property(m => m.nomMenu).HasMaxLength(50).IsRequired();
                 tb.Property(m => m.Url).HasMaxLength(250).IsRequired();
+            });
+
+            modelBuilder.Entity<Cliente>(tb =>
+            {
+                tb.HasKey(c => c.IdCliente);
+                tb.Property(c => c.IdCliente).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(c => c.NomCliente).HasMaxLength(100).IsRequired();
+                tb.Property(c => c.TipoCliente).HasMaxLength(50).IsRequired();
+                tb.Property(c => c.TipoDocumento).HasMaxLength(50).IsRequired();
+                tb.Property(c => c.NumDocumento).HasMaxLength(20).IsRequired();
+                tb.Property(c => c.NumCelular).HasMaxLength(20).IsRequired();
+                tb.Property(c => c.Correo).HasMaxLength(100).IsRequired();
+            });
+
+            modelBuilder.Entity<Venta>(tb =>
+            {
+                tb.HasKey(v => v.IdVenta);
+                tb.Property(v => v.IdVenta).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(v => v.FechaVenta).IsRequired();
+                tb.Property(v => v.MetodoPago).HasMaxLength(50).IsRequired();
+                tb.Property(v => v.Total).HasColumnType("decimal(10,2)").IsRequired();
+
+                tb.HasOne(v => v.Cliente)
+                    .WithMany()
+                    .HasForeignKey(v => v.Cliente_ID);
+
+                tb.HasOne(v => v.Empleado)
+                    .WithMany()
+                    .HasForeignKey(v => v.Empleado_ID);
+            });
+
+            modelBuilder.Entity<Comprobante>(tb =>
+            {
+                tb.HasKey(c => c.IdComprobante);
+                tb.Property(c => c.IdComprobante).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(c => c.TipoComprobante).HasMaxLength(50).IsRequired();
+                tb.Property(c => c.NroComprobante).HasMaxLength(100).IsRequired();
+                tb.Property(c => c.MontoTotal).HasColumnType("decimal(10,2)").IsRequired();
+
+                tb.HasOne(c => c.Venta)
+                    .WithMany()
+                    .HasForeignKey(c => c.Venta_ID);
+            });
+
+            modelBuilder.Entity<Extintor>(tb =>
+            {
+                tb.HasKey(e => e.IdExtintor);
+                tb.Property(e => e.IdExtintor).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(e => e.TipoAgente).HasMaxLength(50).IsRequired();
+                tb.Property(e => e.ClaseFuego).HasMaxLength(50).IsRequired();
+                tb.Property(e => e.CapacidadKG).HasColumnType("decimal(5,2)").IsRequired();
+                tb.Property(e => e.FechaVencimiento).IsRequired();
+                tb.Property(e => e.Estado).HasMaxLength(50).IsRequired();
+
+                tb.HasOne(e => e.Venta)
+                    .WithMany()
+                    .HasForeignKey(e => e.Venta_ID);
+            });
+
+            modelBuilder.Entity<ComprobanteServicio>(tb =>
+            {
+                tb.HasKey(cs => cs.IdComprobante);
+                tb.Property(cs => cs.IdComprobante).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(cs => cs.TipoServicio).HasMaxLength(50).IsRequired();
+                tb.Property(cs => cs.Cantidad).IsRequired();
+                tb.Property(cs => cs.PrecioUnitario).HasColumnType("decimal(10,2)").IsRequired();
+                tb.Property(cs => cs.SubTotal).HasColumnType("decimal(10,2)").IsRequired();
+            });
+
+            modelBuilder.Entity<VisitaTecnica>(tb =>
+            {
+                tb.HasKey(vt => vt.IdVisita);
+                tb.Property(vt => vt.IdVisita).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(vt => vt.Fecha).IsRequired();
+                tb.Property(vt => vt.Observaciones).IsRequired();
+
+                tb.HasOne(vt => vt.Empleado)
+                    .WithMany()
+                    .HasForeignKey(vt => vt.Empleado_ID);
+
+                tb.HasOne(vt => vt.Cliente)
+                    .WithMany()
+                    .HasForeignKey(vt => vt.Cliente_ID);
+            });
+
+            modelBuilder.Entity<InformeTecnico>(tb =>
+            {
+                tb.HasKey(it => it.IdInforme);
+                tb.Property(it => it.IdInforme).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(it => it.FechaInforme).IsRequired();
+                tb.Property(it => it.Informe_PDF).HasMaxLength(255).IsRequired();
+
+                tb.HasOne(it => it.VisitaTecnica)
+                    .WithMany()
+                    .HasForeignKey(it => it.Visita_ID);
+            });
+
+            modelBuilder.Entity<Mantenimiento>(tb =>
+            {
+                tb.HasKey(m => m.IdMantenimiento);
+                tb.Property(m => m.IdMantenimiento).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(m => m.FechaMantenimiento).IsRequired();
+                tb.Property(m => m.LugarAdecuado).IsRequired();
+                tb.Property(m => m.Señalización).IsRequired();
+                tb.Property(m => m.Visible).IsRequired();
+                tb.Property(m => m.Usado).IsRequired();
+                tb.Property(m => m.EstadoPrecinto).IsRequired();
+                tb.Property(m => m.EstadoIndicador).IsRequired();
+                tb.Property(m => m.PresionCorrecta).IsRequired();
+                tb.Property(m => m.ExteriorCorrecto).IsRequired();
+                tb.Property(m => m.PesoCorrecto).IsRequired();
+                tb.Property(m => m.MangueraCorrecta).IsRequired();
+                tb.Property(m => m.BoquillaCorrecta).IsRequired();
+                tb.Property(m => m.InstruccionesVisibles).IsRequired();
+                tb.Property(m => m.AperturaCorrecta).IsRequired();
+                tb.Property(m => m.BarometroCorrecto).IsRequired();
+
+                tb.HasOne(m => m.Empleado)
+                    .WithMany()
+                    .HasForeignKey(m => m.Empleado_ID);
+
+                tb.HasOne(m => m.Extintor)
+                    .WithMany()
+                    .HasForeignKey(m => m.Extintor_ID)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Recarga>(tb =>
+            {
+                tb.HasKey(r => r.IdRecarga);
+                tb.Property(r => r.IdRecarga).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(r => r.FechaRecarga).IsRequired();
+                tb.Property(r => r.MaterialUsado).HasMaxLength(100).IsRequired();
+                tb.Property(r => r.CantidadKG).HasColumnType("decimal(5,2)").IsRequired();
+                tb.Property(r => r.PresionPostRecarga).HasColumnType("decimal(5,2)").IsRequired();
+
+                tb.HasOne(r => r.Extintor)
+                    .WithMany()
+                    .HasForeignKey(r => r.Extintor_ID);
+
+                tb.HasOne(r => r.Empleado)
+                    .WithMany()
+                    .HasForeignKey(r => r.Empleado_ID);
+            });
+
+            modelBuilder.Entity<ReporteServicio>(tb =>
+            {
+                tb.HasKey(rs => rs.IdReporte);
+                tb.Property(rs => rs.IdReporte).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(rs => rs.FirmaCliente).HasColumnType("VARBINARY(MAX)").IsRequired();
+                tb.Property(rs => rs.Observaciones).IsRequired();
+                tb.Property(rs => rs.ImgEvidencia).HasColumnType("VARBINARY(MAX)").IsRequired();
+
+                tb.HasOne(rs => rs.Cliente)
+                    .WithMany()
+                    .HasForeignKey(rs => rs.Cliente_ID);
+
+                tb.HasOne(rs => rs.ComprobanteServicio)
+        .WithMany()
+        .HasForeignKey(rs => rs.Comprobante_ID);
+
+                tb.HasOne(rs => rs.Mantenimiento)
+        .WithMany()
+        .HasForeignKey(rs => rs.Mantenimiento_ID);
+
+                tb.HasOne(rs => rs.Recarga)
+        .WithMany()
+        .HasForeignKey(rs => rs.Recarga_ID);
             });
 
             modelBuilder.Entity<Empleado>().ToTable("Empleado");
