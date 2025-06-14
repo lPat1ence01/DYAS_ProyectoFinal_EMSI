@@ -5,6 +5,8 @@
 }
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var empresas = ViewBag.Empresas as List<EMSI_Corporation.Models.Cliente>;
+    var trabajadores = ViewBag.Trabajadores as List<EMSI_Corporation.Models.Empleado>;
 }
 @model EMSI_Corporation.ViewModels.ClienteTrabajadorVM;
 
@@ -25,13 +27,21 @@
                         <select class="field" asp-for="nom_cliente">
                             <option value="1">Empresa 1</option>
                             <option value="2">Empresa 2</option>
-                        </select>
+                        @foreach (var empresa in empresas)
+                        {
+                            <option value=@empresa.IdCliente>@empresa.NomCliente</option>
+                        }
+                    </select>
                     </div>
                     <div class="form-line">
                         <span>Trabajador:</span>
                         <select class="field" asp-for="nom_trabajador">
                             <option value="1">Trabajador 1</option>
                             <option value="2">Trabajador 2</option>
+                            @foreach (var trabajador in trabajadores)
+                            {
+                            <option value=@trabajador.IdEmpleado>@trabajador.nomEmpleado</option>
+                            }
                         </select>
                     </div>
             </div>

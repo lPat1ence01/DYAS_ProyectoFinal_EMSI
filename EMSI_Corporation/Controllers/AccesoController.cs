@@ -33,8 +33,51 @@ namespace EMSI_Corporation.Controllers
         [HttpGet]
         public IActionResult PopupMant()
         {
+            ViewBag.Empresas = _appDBContext.Clientes.ToList();
+            ViewBag.Trabajadores = _appDBContext.empleados.ToList();
             return View();
         }
+        [HttpGet]
+        public IActionResult Stakeholders()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Stakeholders_Cliente()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Stakeholders_Proovedor()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Agregar_Cliente()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Agregar_Cliente(/*Cliente cliente*/int id)
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Editar_Cliente(int id)
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult Editar_Cliente(/*Cliente cliente*/)
+        {
+            return View();
+        }
+
         [HttpPost]
         public IActionResult GoToMant(ClienteTrabajadorVM cliente_trabajador)
         {

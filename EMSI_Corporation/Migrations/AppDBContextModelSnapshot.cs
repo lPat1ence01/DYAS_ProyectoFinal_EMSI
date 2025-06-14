@@ -608,7 +608,7 @@ namespace EMSI_Corporation.Migrations
                     b.HasOne("EMSI_Corporation.Models.Extintor", "Extintor")
                         .WithMany()
                         .HasForeignKey("Extintor_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Empleado");
@@ -639,7 +639,7 @@ namespace EMSI_Corporation.Migrations
                     b.HasOne("EMSI_Corporation.Models.Recarga", "Recarga")
                         .WithMany()
                         .HasForeignKey("Recarga_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Cliente");

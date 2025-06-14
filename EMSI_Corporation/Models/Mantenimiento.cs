@@ -28,6 +28,7 @@ namespace EMSI_Corporation.Models
         public int Empleado_ID { get; set; }
         public Empleado Empleado { get; set; }
 
+
         [ForeignKey("Extintor")]
         public int Extintor_ID { get; set; }
         public Extintor Extintor { get; set; }

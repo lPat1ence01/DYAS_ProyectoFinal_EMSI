@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EMSI_Corporation.Migrations
 {
     /// <inheritdoc />
-    public partial class Migraciondemodelosxd : Migration
+    public partial class migK : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -43,6 +43,72 @@ namespace EMSI_Corporation.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ComprobantesServicio", x => x.IdComprobante);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Empleado",
+                columns: table => new
+                {
+                    IdEmpleado = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    nomEmpleado = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    apeEmpleado = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    dni = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
+                    gmail = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    numCelular = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Empleado", x => x.IdEmpleado);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Menu",
+                columns: table => new
+                {
+                    IdMenu = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    nomMenu = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Menu", x => x.IdMenu);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rol",
+                columns: table => new
+                {
+                    IdRol = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    nomRol = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rol", x => x.IdRol);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Usuario",
+                columns: table => new
+                {
+                    IdUsuario = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    usuario = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    IdEmpleado = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Usuario", x => x.IdUsuario);
+                    table.ForeignKey(
+                        name: "FK_Usuario_Empleado_IdEmpleado",
+                        column: x => x.IdEmpleado,
+                        principalTable: "Empleado",
+                        principalColumn: "IdEmpleado",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -99,6 +165,54 @@ namespace EMSI_Corporation.Migrations
                         column: x => x.Empleado_ID,
                         principalTable: "Empleado",
                         principalColumn: "IdEmpleado",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rol_Menu",
+                columns: table => new
+                {
+                    IdRol = table.Column<int>(type: "int", nullable: false),
+                    IdMenu = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rol_Menu", x => new { x.IdMenu, x.IdRol });
+                    table.ForeignKey(
+                        name: "FK_Rol_Menu_Menu_IdMenu",
+                        column: x => x.IdMenu,
+                        principalTable: "Menu",
+                        principalColumn: "IdMenu",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Rol_Menu_Rol_IdRol",
+                        column: x => x.IdRol,
+                        principalTable: "Rol",
+                        principalColumn: "IdRol",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "User_Rol",
+                columns: table => new
+                {
+                    IdUsuario = table.Column<int>(type: "int", nullable: false),
+                    IdRol = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User_Rol", x => new { x.IdUsuario, x.IdRol });
+                    table.ForeignKey(
+                        name: "FK_User_Rol_Rol_IdRol",
+                        column: x => x.IdRol,
+                        principalTable: "Rol",
+                        principalColumn: "IdRol",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_User_Rol_Usuario_IdUsuario",
+                        column: x => x.IdUsuario,
+                        principalTable: "Usuario",
+                        principalColumn: "IdUsuario",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -206,8 +320,7 @@ namespace EMSI_Corporation.Migrations
                         name: "FK_Mantenimientos_Extintores_Extintor_ID",
                         column: x => x.Extintor_ID,
                         principalTable: "Extintores",
-                        principalColumn: "IdExtintor",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "IdExtintor");
                 });
 
             migrationBuilder.CreateTable(
@@ -236,8 +349,7 @@ namespace EMSI_Corporation.Migrations
                         name: "FK_Recargas_Extintores_Extintor_ID",
                         column: x => x.Extintor_ID,
                         principalTable: "Extintores",
-                        principalColumn: "IdExtintor",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "IdExtintor");
                 });
 
             migrationBuilder.CreateTable(
@@ -279,8 +391,7 @@ namespace EMSI_Corporation.Migrations
                         name: "FK_ReportesServicio_Recargas_Recarga_ID",
                         column: x => x.Recarga_ID,
                         principalTable: "Recargas",
-                        principalColumn: "IdRecarga",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "IdRecarga");
                 });
 
             migrationBuilder.CreateIndex(
@@ -339,6 +450,22 @@ namespace EMSI_Corporation.Migrations
                 column: "Recarga_ID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Rol_Menu_IdRol",
+                table: "Rol_Menu",
+                column: "IdRol");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_Rol_IdRol",
+                table: "User_Rol",
+                column: "IdRol");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Usuario_IdEmpleado",
+                table: "Usuario",
+                column: "IdEmpleado",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Ventas_Cliente_ID",
                 table: "Ventas",
                 column: "Cliente_ID");
@@ -372,6 +499,12 @@ namespace EMSI_Corporation.Migrations
                 name: "ReportesServicio");
 
             migrationBuilder.DropTable(
+                name: "Rol_Menu");
+
+            migrationBuilder.DropTable(
+                name: "User_Rol");
+
+            migrationBuilder.DropTable(
                 name: "VisitasTecnicas");
 
             migrationBuilder.DropTable(
@@ -384,6 +517,15 @@ namespace EMSI_Corporation.Migrations
                 name: "Recargas");
 
             migrationBuilder.DropTable(
+                name: "Menu");
+
+            migrationBuilder.DropTable(
+                name: "Rol");
+
+            migrationBuilder.DropTable(
+                name: "Usuario");
+
+            migrationBuilder.DropTable(
                 name: "Extintores");
 
             migrationBuilder.DropTable(
@@ -391,6 +533,9 @@ namespace EMSI_Corporation.Migrations
 
             migrationBuilder.DropTable(
                 name: "Clientes");
+
+            migrationBuilder.DropTable(
+                name: "Empleado");
         }
     }
 }

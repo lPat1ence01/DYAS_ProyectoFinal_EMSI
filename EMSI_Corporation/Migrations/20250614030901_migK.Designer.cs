@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMSI_Corporation.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250611013805_Migraciondemodelosxd")]
-    partial class Migraciondemodelosxd
+    [Migration("20250614030901_migK")]
+    partial class migK
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -592,7 +592,7 @@ namespace EMSI_Corporation.Migrations
                     b.HasOne("EMSI_Corporation.Models.Extintor", "Extintor")
                         .WithMany()
                         .HasForeignKey("Extintor_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Empleado");
@@ -611,7 +611,7 @@ namespace EMSI_Corporation.Migrations
                     b.HasOne("EMSI_Corporation.Models.Extintor", "Extintor")
                         .WithMany()
                         .HasForeignKey("Extintor_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Empleado");
@@ -642,7 +642,7 @@ namespace EMSI_Corporation.Migrations
                     b.HasOne("EMSI_Corporation.Models.Recarga", "Recarga")
                         .WithMany()
                         .HasForeignKey("Recarga_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Cliente");

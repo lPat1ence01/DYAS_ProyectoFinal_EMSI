@@ -121,6 +121,25 @@ main {
     filter: brightness(90%);
 }
 
+.stakeholder{
+    transition: all 500ms ease;
+}
+    .stakeholder:hover:not(.selected) {
+        background-color: var(--color-rojo);
+        filter: brightness(200%) saturate(70%);
+        transition: all 200ms ease;
+        cursor: pointer;
+    }
+.stakeholder.selected {
+    background-color: var(--color-rojo);
+    transition: all 200ms ease;
+}
+
+.stakeholder:hover > h1, .stakeholder.selected > h1 {
+    color: white !important;
+    transition: all 200ms ease;
+}
+
 @keyframes field {
     0% {
         border-right: solid #BC1C34 0px;
