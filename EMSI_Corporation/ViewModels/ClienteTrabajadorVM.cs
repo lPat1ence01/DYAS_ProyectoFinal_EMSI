@@ -1,11 +1,8 @@
-﻿using EMSI_Corporation.Models;
-
-namespace EMSI_Corporation.ViewModels
+﻿namespace EMSI_Corporation.ViewModels
 {
     public class ClienteTrabajadorVM
     {
-
-        public Cliente cliente { get; set; }
-        public Empleado trabajador { get; set; }
+        public string nom_cliente { get; set; }
+        public string nom_trabajador { get; set; }
     }
 }

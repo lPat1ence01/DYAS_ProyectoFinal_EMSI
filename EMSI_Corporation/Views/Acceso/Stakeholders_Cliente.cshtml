@@ -1,8 +1,6 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@model IEnumerable<EMSI_Corporation.Models.Cliente>
-
 
 <main>
     <div class="seccion d-flex flex-row w-100 gap-4">
@@ -15,30 +13,31 @@
     <table class="table">
         <thead>
             <tr>
-                <th scope="col">Id</th>
-                <th scope="col">Nombres / Razon Social</th>
-                <th scope="col">Tipo de cliente</th>
-                <th scope="col">Tipo de documento</th>
-                <th scope="col">Numero de documento</th>
-                <th scope="col">Teléfono</th>
-                <th scope="col">Correo</th>
+                <th scope="col">id</th>
+                <th scope="col">Nombres y apellidos</th>
+                <th scope="col">Estado</th>
                 <th scope="col">Acciones</th>
             </tr>
         </thead>
         <tbody>
-            @foreach(var cli in Model)
-            {
-                <tr>
-                    <th scope="row">@cli.IdCliente</th>
-                    <td>@cli.NomCliente</td>
-                    <td>@cli.TipoCliente</td>
-                    <td>@cli.TipoDocumento</td>
-                    <td>@cli.NumDocumento</td>
-                    <td>@cli.NumCelular</td>
-                    <td>@cli.Correo</td>
-                    <td><a asp-controller="Acceso" asp-action="Editar_Cliente" asp-route-id=@cli.IdCliente>editar</a></td>
-                </tr>
-            }
+            <tr>
+                <th scope="row">1</th>
+                <td>84652</td>
+                <td>Perfecto</td>
+                <td><a asp-controller="Acceso" asp-action="Editar_Cliente">editar</a></td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td>4521</td>
+                <td>Dañado</td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row">3</th>
+                <td>55568</td>
+                <td>Perfecto</td>
+                <td></td>
+            </tr>
         </tbody>
     </table>
 </main>
