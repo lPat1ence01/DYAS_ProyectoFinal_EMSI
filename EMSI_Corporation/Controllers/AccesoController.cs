@@ -7,12 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Http.Headers;
 using OfficeOpenXml;
+using Microsoft.AspNetCore.Mvc.ViewComponents;
 
 namespace EMSI_Corporation.Controllers
 {
     public class AccesoController : Controller
     {
         private readonly AppDBContext _appDBContext;
+
+        public List<MantenimientoVM> ls_mantenimientos = new List<MantenimientoVM>();
 
         public AccesoController(AppDBContext appDBContext)
         {
@@ -30,6 +33,66 @@ namespace EMSI_Corporation.Controllers
         {
             return View();
         }
+
+        private IActionResult MantenimientoAgregarLista()
+        {
+            
+            
+            
+        }
+
+        [HttpPost]
+        public IActionResult MantenimientoPOST(MantenimientoPOSTVM mant)
+        {
+            Cliente? cli = _appDBContext.Clientes.Find(mant.IdCliente);
+            if (cli == null) return null;
+            Empleado? em = _appDBContext.empleados.Find(mant.IdEmpleado);
+            if (em == null) return null;
+            ClienteTrabajadorVM cliente_trabajador = new ClienteTrabajadorVM
+            {
+                cliente = cli,
+                trabajador = em//////////////////////////////////////////////////////////
+            };
+
+            MantenimientoVM mantenimientoVM = new MantenimientoVM
+            {
+                AperturaCorrecta = mant.AperturaCorrecta,
+                BarometroCorrecto = mant.BarometroCorrecto,
+                BoquillaCorrecta = mant.BoquillaCorrecta,
+                EstadoIndicador = mant.EstadoIndicador,
+                EstadoPrecinto = mant.EstadoPrecinto,
+                ExteriorCorrecto = mant.ExteriorCorrecto,
+                FechaMantenimiento = mant.FechaMantenimiento,
+                id_extintor = mant.IdExtintor,
+                InstruccionesVisibles = mant.InstruccionesVisibles,
+                LugarAdecuado = mant.LugarAdecuado,
+                MangueraCorrecta = mant.MangueraCorrecta,
+                PesoCorrecto = mant.PesoCorrecto,
+                PresionCorrecta = mant.PresionCorrecta,
+                Señalización = mant.Señalización,
+                Usado = mant.Usado,
+                Visible = mant.Visible,
+
+            };
+
+            for (var i = 0; i < ls_mantenimientos.Count; i++)
+            {
+                if (ls_mantenimientos[i].id_extintor == mant.IdExtintor)
+                {
+                    ls_mantenimientos[i] = mantenimientoVM;
+                    ViewBag.cliente_trabajador = cliente_trabajador;
+
+                    return View("Mantenimiento");
+                }
+            }
+            this.ls_mantenimientos.Add(mantenimientoVM);
+            ViewBag.cliente_trabajador = cliente_trabajador;
+
+            return View("Mantenimiento");
+
+            return MantenimientoAgregarLista();
+
+        }
         [HttpGet]
         public IActionResult PopupMant()
         {
@@ -46,7 +109,9 @@ namespace EMSI_Corporation.Controllers
         [HttpGet]
         public IActionResult Stakeholders_Cliente()
         {
-            return View();
+            var clientes = _appDBContext.Clientes.ToList();
+
+            return View(clientes);
         }
 
         [HttpGet]
@@ -62,20 +127,36 @@ namespace EMSI_Corporation.Controllers
         }
 
         [HttpPost]
-        public IActionResult Agregar_Cliente(/*Cliente cliente*/int id)
+        public IActionResult Agregar_Cliente(Cliente cliente)
         {
+            if (ModelState.IsValid)
+            {
+                _appDBContext.Clientes.Add(cliente);
+                _appDBContext.SaveChanges();
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
             return View();
         }
 
         [HttpGet]
         public IActionResult Editar_Cliente(int id)
         {
-            return View();
+            var cliente = _appDBContext.Clientes.Find(id);
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return View(cliente);
+            }
         }
         [HttpPost]
-        public IActionResult Editar_Cliente(/*Cliente cliente*/)
+        public IActionResult Editar_Cliente(Cliente cliente)
         {
-            return View();
+            _appDBContext.Clientes.Update(cliente);
+            _appDBContext.SaveChanges();
+            return RedirectToAction(nameof(Stakeholders_Cliente));
         }
 
         [HttpPost]
@@ -86,8 +167,10 @@ namespace EMSI_Corporation.Controllers
             worksheet.Cell("A1").Value = "Hello World 2!";
             worksheet.Cell("A2").FormulaA1 = "MID(A1, 7, 5)";
             workbook.Save();*/
-            
-            return View("Mantenimiento",cliente_trabajador);
+            ViewBag.cliente_trabajador = cliente_trabajador;
+
+
+            return View("Mantenimiento");
         }
 
         [HttpGet]

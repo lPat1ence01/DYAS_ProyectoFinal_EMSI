@@ -1,11 +1,44 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model EMSI_Corporation.Models.Cliente;
+
 <main>
-    <form asp-controller="Acceso" asp-action="Agregar_Cliente" method="post" class="w-100 d-flex flex-column gap-4 align-items-center justify-content-center">
-        <input class="field" />
-        <button class="btn-1" type="submit">Añadir</button>
-    </form>
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <form asp-controller="Acceso" asp-action="Agregar_Cliente" method="post" class="seccion shadow p-4 rounded" style="min-width: 350px;">
+            <h2 class="text-center mb-4">Registrar Cliente</h2>
+
+            <div class="mb-3">
+                <label for="NomCliente" class="form-label">Nombre</label>
+                <input type="text" id="NomCliente" name="NomCliente" class="field form-control" value="@Model?.NomCliente" />
+            </div>
+
+            <div class="mb-3">
+                <label for="TipoCliente" class="form-label">Tipo de Cliente</label>
+                <input type="text" id="TipoCliente" name="TipoCliente" class="field form-control" value="@Model?.TipoCliente" />
+            </div>
+
+            <div class="mb-3">
+                <label for="TipoDocumento" class="form-label">Tipo de Documento</label>
+                <input type="text" id="TipoDocumento" name="TipoDocumento" class="field form-control" value="@Model?.TipoDocumento" />
+            </div>
+
+            <div class="mb-3">
+                <label for="NumDocumento" class="form-label">Número de Documento</label>
+                <input type="text" id="NumDocumento" name="NumDocumento" class="field form-control" value="@Model?.NumDocumento" />
+            </div>
+
+            <div class="mb-3">
+                <label for="NumCelular" class="form-label">Celular</label>
+                <input type="text" id="NumCelular" name="NumCelular" class="field form-control" value="@Model?.NumCelular" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Correo" class="form-label">Correo Electrónico</label>
+                <input type="email" id="Correo" name="Correo" class="field form-control" value="@Model?.Correo" />
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn-1">Guardar</button>
+            </div>
+        </form>
+    </div>
+
 </main>
