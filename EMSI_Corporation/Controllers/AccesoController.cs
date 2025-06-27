@@ -19,7 +19,7 @@ namespace EMSI_Corporation.Controllers
     {
         private readonly AppDBContext _appDBContext;
         private readonly PasswordHasher<Usuario> _passwordHasher;
-
+        //prueba
         public AccesoController(AppDBContext appDBContext)
         {
             _appDBContext = appDBContext;
