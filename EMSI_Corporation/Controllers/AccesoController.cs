@@ -7,25 +7,79 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Http.Headers;
 using OfficeOpenXml;
-using Microsoft.AspNetCore.Mvc.ViewComponents;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 
 namespace EMSI_Corporation.Controllers
 {
     public class AccesoController : Controller
     {
         private readonly AppDBContext _appDBContext;
+        private readonly PasswordHasher<Usuario> _passwordHasher;
 
         public List<MantenimientoVM> ls_mantenimientos = new List<MantenimientoVM>();
 
         public AccesoController(AppDBContext appDBContext)
         {
             _appDBContext = appDBContext;
+            _passwordHasher = new PasswordHasher<Usuario>();
         }
 
         [HttpGet]
         public IActionResult Login()
         {
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginVM modelo)
+        {
+            var usuario = await _appDBContext.usuarios
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Rol)
+                .FirstOrDefaultAsync(u => u.Correo.Trim().ToLower() == modelo.Correo.Trim().ToLower());
+
+            if (usuario == null)
+            {
+                ModelState.AddModelError(string.Empty, "El usuario no existe.");
+                return View();
+            }
+
+            var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.Contraseña, modelo.Password);
+
+            if (resultado == PasswordVerificationResult.Failed)
+            {
+                ModelState.AddModelError(string.Empty, "Contraseña incorrecta.");
+                return View();
+            }
+
+            // Suponiendo que un usuario puede tener varios roles, tomamos el primero
+            var rolUsuario = usuario.UserRoles.FirstOrDefault()?.Rol?.Nombre ?? "Usuario";
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, usuario.IDUsuario.ToString()),
+                new Claim(ClaimTypes.Name, usuario.Nombre),
+                new Claim(ClaimTypes.Email, usuario.Correo),
+                new Claim(ClaimTypes.Role, rolUsuario)
+            };
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+
+            if (rolUsuario == "Administrador")
+            {
+                return RedirectToAction("Index", "Usuarios");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Articulos");
+            }
+            return View(usuario);
         }
 
         [HttpGet]
