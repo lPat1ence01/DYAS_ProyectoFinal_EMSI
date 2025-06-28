@@ -1,0 +1,64 @@
+﻿@model List<EMSI_Corporation.Models.Extintor>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-gradient text-white" style="background: linear-gradient(90deg, #0d6efd, #6610f2);">
+            <h3 class="mb-0">Inventario de Extintores</h3>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo de Agente</th>
+                                <th>Clase de Fuego</th>
+                                <th>Capacidad (KG)</th>
+                                <th>Fecha de Vencimiento</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ext in Model)
+                            {
+                                <tr class="text-center">
+                                    <td>@ext.IdExtintor</td>
+                                    <td>@ext.TipoAgente</td>
+                                    <td>@ext.ClaseFuego</td>
+                                    <td>@ext.CapacidadKG</td>
+                                    <td>@ext.FechaVencimiento.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        @if (ext.Estado == "Operativo")
+                                        {
+                                            <span class="badge bg-success">Operativo</span>
+                                        }
+                                        else if (ext.Estado == "Inoperativo")
+                                        {
+                                            <span class="badge bg-danger">Inoperativo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@ext.Estado</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center" role="alert">
+                    No hay extintores registrados en el inventario.
+                </div>
+            }
+        </div>
+    </div>
+</div>

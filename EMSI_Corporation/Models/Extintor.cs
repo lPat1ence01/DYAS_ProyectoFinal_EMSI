@@ -15,7 +15,12 @@ namespace EMSI_Corporation.Models
         public string Estado { get; set; }
 
         [ForeignKey("Venta")]
-        public int Venta_ID { get; set; }
+        public int? Venta_ID { get; set; }
         public Venta Venta { get; set; }
+
+        [ForeignKey("Recepcion")]
+        public int? RecepcionId { get; set; }
+        public Recepcion Recepcion { get; set; }
+
     }
 }

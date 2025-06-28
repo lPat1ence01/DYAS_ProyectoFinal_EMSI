@@ -1,0 +1,28 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Registrar Recepción</h2>
+
+<form asp-action="CrearRecepcion" method="post">
+    <div>
+        <label>Fecha</label>
+        <input type="date" name="Fecha" required />
+    </div>
+
+    <div>
+        <label>Proveedor</label>
+        <select name="ProovedorId" class="form-select" required>
+            <option value="">-- Seleccione un proveedor --</option>
+            @foreach (var proovedor in ViewBag.Proovedores)
+            {
+                <option value="@proovedor.Value">@proovedor.Text</option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <button type="submit">Realizar Recepción</button>
+    </div>
+</form>
+

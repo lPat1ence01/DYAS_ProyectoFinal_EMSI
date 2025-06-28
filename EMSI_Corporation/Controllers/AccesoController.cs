@@ -31,7 +31,7 @@ namespace EMSI_Corporation.Controllers
         {
             return View();
         }
-
+        /*
         [HttpPost]
         public async Task<IActionResult> Login(LoginVM modelo)
         {
@@ -78,7 +78,7 @@ namespace EMSI_Corporation.Controllers
                 return RedirectToAction("Index", "Articulos");
             }
             return View(usuario);
-        }
+        }*/
 
         [HttpGet]
         public IActionResult Mantenimiento()
@@ -98,39 +98,137 @@ namespace EMSI_Corporation.Controllers
             return View();
         }
 
+        // Listar
         [HttpGet]
         public IActionResult Stakeholders_Cliente()
         {
+            var lista = _appDBContext.Clientes.ToList();
+            return View(lista);
+        }
+
+        // Crear
+        [HttpGet]
+        public IActionResult CrearCliente()
+        {
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult CrearCliente(Cliente cliente)
+        {
+            _appDBContext.Clientes.Add(cliente);
+            _appDBContext.SaveChanges();
+            return RedirectToAction(nameof(Stakeholders_Cliente));
+        }
+
+        // Editar
+        [HttpGet]
+        public IActionResult EditarCliente(int id)
+        {
+            var cliente = _appDBContext.Clientes.Find(id);
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+            return View(cliente);
+        }
+
+        [HttpPost]
+        public IActionResult EditarCliente(Cliente cliente)
+        {
+            _appDBContext.Clientes.Update(cliente);
+            _appDBContext.SaveChanges();
+            return RedirectToAction(nameof(Stakeholders_Cliente));
+        }
+
+        // Eliminar
+        [HttpGet]
+        public IActionResult EliminarCliente(int id)
+        {
+            var cliente = _appDBContext.Clientes.Find(id);
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+            return View(cliente);
+        }
+
+        [HttpPost]
+        public IActionResult ConfirmarEliminarCliente(Cliente cliente)
+        {
+            var entidad = _appDBContext.Clientes.Find(cliente.IdCliente);
+            if (entidad != null)
+            {
+                _appDBContext.Clientes.Remove(entidad);
+                _appDBContext.SaveChanges();
+            }
+            return RedirectToAction(nameof(Stakeholders_Cliente));
         }
 
         [HttpGet]
         public IActionResult Stakeholders_Proovedor()
         {
-            return View();
+            var lista = _appDBContext.Provedor.ToList();
+            return View(lista);
         }
 
+        //Crear
         [HttpGet]
-        public IActionResult Agregar_Cliente()
+        public IActionResult CrearProovedor()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult Agregar_Cliente(/*Cliente cliente*/int id)
+        public IActionResult CrearProovedor(Proovedor proveedor)
         {
-            return View();
+            _appDBContext.Provedor.Add(proveedor);
+            _appDBContext.SaveChanges();
+            return RedirectToAction(nameof(Stakeholders_Proovedor));
         }
 
+        //Editar
         [HttpGet]
-        public IActionResult Editar_Cliente(int id)
+        public IActionResult EditarProovedor(int id)
         {
-            return View();
+            var proveedor = _appDBContext.Provedor.Find(id);
+            if (proveedor == null)
+            {
+                return NotFound();
+            }
+            return View(proveedor);
         }
+
         [HttpPost]
-        public IActionResult Editar_Cliente(/*Cliente cliente*/)
+        public IActionResult EditarProovedor(Proovedor proveedor)
         {
-            return View();
+            _appDBContext.Provedor.Update(proveedor);
+            _appDBContext.SaveChanges();
+            return RedirectToAction(nameof(Stakeholders_Proovedor));
+        }
+
+        //Eliminar
+        [HttpGet]
+        public IActionResult EliminarProovedor(int id)
+        {
+            var proveedor = _appDBContext.Provedor.Find(id);
+            if (proveedor == null)
+            {
+                return NotFound();
+            }
+            return View(proveedor);
+        }
+
+        [HttpPost]
+        public IActionResult ConfirmarEliminarProovedor(Proovedor proveedor)
+        {
+            var entidad = _appDBContext.Provedor.Find(proveedor.IdProovedor);
+            if (entidad != null)
+            {
+                _appDBContext.Provedor.Remove(entidad);
+                _appDBContext.SaveChanges();
+            }
+            return RedirectToAction(nameof(Stakeholders_Proovedor));
         }
 
         [HttpPost]

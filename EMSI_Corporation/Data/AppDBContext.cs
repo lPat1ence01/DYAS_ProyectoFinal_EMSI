@@ -27,6 +27,8 @@ namespace EMSI_Corporation.Data
         public DbSet<Mantenimiento> Mantenimientos { get; set; }
         public DbSet<Recarga> Recargas { get; set; }
         public DbSet<ReporteServicio> ReportesServicio { get; set; }
+        public DbSet<Recepcion> Recepcion { get; set; }
+        public DbSet<Proovedor> Provedor { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -272,12 +274,45 @@ namespace EMSI_Corporation.Data
         .HasForeignKey(rs => rs.Recarga_ID).OnDelete(DeleteBehavior.NoAction);
             });
 
+            modelBuilder.Entity<Recepcion>(tb =>
+            {
+                tb.HasKey(rp => rp.IdRecepcion);
+                tb.Property(rp => rp.IdRecepcion).UseIdentityColumn().ValueGeneratedOnAdd();
+                tb.Property(rp => rp.Fecha).IsRequired();
+
+                // Relación con Usuario
+                tb.HasOne(r => r.Usuario)
+                  .WithMany(u => u.Recepciones)
+                  .HasForeignKey(r => r.UsuarioId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+                // Relación con Proovedor
+                tb.HasOne(r => r.Proovedor)
+                  .WithMany(p => p.Recepciones)
+                  .HasForeignKey(r => r.ProovedorId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Proovedor>(tb =>
+            {
+                tb.HasKey(pro => pro.IdProovedor);
+                tb.Property(pro => pro.RazonSocial).HasMaxLength(100).IsRequired();
+                tb.Property(pro => pro.RUC).HasMaxLength(11).IsRequired();
+                tb.Property(pro => pro.Direccion).HasMaxLength(150);
+                tb.Property(pro => pro.NumCelular).HasMaxLength(15);
+                tb.Property(pro => pro.Correo).HasMaxLength(100);
+                tb.Property(pro => pro.estado).IsRequired();
+            });
+
+
             modelBuilder.Entity<Empleado>().ToTable("Empleado");
             modelBuilder.Entity<Usuario>().ToTable("Usuario");
             modelBuilder.Entity<User_Rol>().ToTable("User_Rol");
             modelBuilder.Entity<Rol>().ToTable("Rol");
             modelBuilder.Entity<Rol_Menu>().ToTable("Rol_Menu");
             modelBuilder.Entity<Menu>().ToTable("Menu");
+            modelBuilder.Entity<Recepcion>().ToTable("Recepcion");
+            modelBuilder.Entity<Proovedor>().ToTable("Proovedor");
         }
     }
 }
