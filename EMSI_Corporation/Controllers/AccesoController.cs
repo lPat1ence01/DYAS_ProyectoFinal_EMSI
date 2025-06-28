@@ -168,7 +168,7 @@ namespace EMSI_Corporation.Controllers
         [HttpGet]
         public IActionResult Stakeholders_Proovedor()
         {
-            var lista = _appDBContext.Provedor.ToList();
+            var lista = _appDBContext.Provedor?.ToList();
             return View(lista);
         }
 

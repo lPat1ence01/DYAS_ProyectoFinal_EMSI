@@ -21,5 +21,11 @@ namespace EMSI_Corporation.Controllers
             return View(extintores);
             //hola
         }
+        [HttpGet]
+        public async Task<IActionResult> AgregarExtintor()
+        {
+            return View();
+            //hola
+        }
     }
 }
