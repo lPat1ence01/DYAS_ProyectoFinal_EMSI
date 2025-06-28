@@ -24,7 +24,7 @@
                     
                     <div class="form-line">
                         <span>Empresa:</span>
-                        <select class="field" asp-for="nom_cliente">
+                        <select class="field" asp-for="cliente.NomCliente">
                             <option value="1">Empresa 1</option>
                             <option value="2">Empresa 2</option>
                         @foreach (var empresa in empresas)
@@ -35,7 +35,7 @@
                     </div>
                     <div class="form-line">
                         <span>Trabajador:</span>
-                        <select class="field" asp-for="nom_trabajador">
+                        <select class="field" asp-for="empleado.nomEmpleado">
                             <option value="1">Trabajador 1</option>
                             <option value="2">Trabajador 2</option>
                             @foreach (var trabajador in trabajadores)

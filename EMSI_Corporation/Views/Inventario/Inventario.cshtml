@@ -22,6 +22,7 @@
                                 <th>Capacidad (KG)</th>
                                 <th>Fecha de Vencimiento</th>
                                 <th>Estado</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,6 +47,9 @@
                                         {
                                             <span class="badge bg-secondary">@ext.Estado</span>
                                         }
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-sm btn-warning" asp-controller="Mantenimiento" asp-action="Index" asp-route-id=@ext.IdExtintor>Ver mantenimientos</a>
                                     </td>
                                 </tr>
                             }

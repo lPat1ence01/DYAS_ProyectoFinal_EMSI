@@ -1,0 +1,55 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<EMSI_Corporation.Models.Mantenimiento>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var ExtintorId = ViewBag.ExtintorId as int?;
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-gradient text-white" style="background: linear-gradient(90deg, #0d6efd, #6610f2);">
+            <h3 class="mb-0">Inventario de Extintores</h3>
+        </div>
+        <div class="card-body">
+            <a asp-controller="Mantenimiento" asp-action="Registrar" asp-route-id=@ExtintorId>Registrar Mantenimiento</a>
+            <a asp-controller="Venta" asp-action="Registrar" asp-route-idExtintor=@ExtintorId>Registrar Venta</a>
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th>ID</th>
+                                <th>Id Extintor</th>
+                                <th>Nombre empleado</th>
+                                <th>Fecha mantenimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var mant in Model)
+                            {
+                                <tr class="text-center">
+                                    <td>@mant.IdMantenimiento</td>
+                                    <td>@mant.Extintor_ID</td>
+                                    <td>@mant.Empleado.nomEmpleado</td>
+                                    <td>@mant.FechaMantenimiento.ToString("yyyy-MM-dd")</td>
+                                    
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                
+                <div class="alert alert-warning text-center" role="alert">
+                    No hay extintores registrados en el inventario.
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -231,6 +231,72 @@ namespace EMSI_Corporation.Controllers
             return RedirectToAction(nameof(Stakeholders_Proovedor));
         }
 
+        [HttpGet]
+        public IActionResult Stakeholders_Empleado()
+        {
+            var lista = _appDBContext.empleados?.ToList();
+            return View(lista);
+        }
+
+        //Crear
+        [HttpGet]
+        public IActionResult CrearEmpleado()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CrearEmpleado(Empleado empleado)
+        {
+            _appDBContext.empleados.Add(empleado);
+            _appDBContext.SaveChanges();
+            return RedirectToAction(nameof(Stakeholders_Empleado));
+        }
+
+        //Editar
+        [HttpGet]
+        public IActionResult EditarEmpleado(int id)
+        {
+            var empleado = _appDBContext.empleados.Find(id);
+            if (empleado == null)
+            {
+                return NotFound();
+            }
+            return View(empleado);
+        }
+
+        [HttpPost]
+        public IActionResult EditarEmpleado(Empleado empleado)
+        {
+            _appDBContext.empleados.Update(empleado);
+            _appDBContext.SaveChanges();
+            return RedirectToAction(nameof(Stakeholders_Empleado));
+        }
+
+        //Eliminar
+        [HttpGet]
+        public IActionResult EliminarEmpleado(int id)
+        {
+            var empleado = _appDBContext.empleados.Find(id);
+            if (empleado == null)
+            {
+                return NotFound();
+            }
+            return View(empleado);
+        }
+
+        [HttpPost]
+        public IActionResult ConfirmarEliminarEmpleado(Empleado empleado)
+        {
+            var entidad = _appDBContext.empleados.Find(empleado.IdEmpleado);
+            if (entidad != null)
+            {
+                _appDBContext.empleados.Remove(entidad);
+                _appDBContext.SaveChanges();
+            }
+            return RedirectToAction(nameof(Stakeholders_Empleado));
+        }
+
         [HttpPost]
         public IActionResult GoToMant(ClienteTrabajadorVM cliente_trabajador)
         {
