@@ -1,6 +1,8 @@
 ﻿using EMSI_Corporation.Data;
+using EMSI_Corporation.Views.Inventario;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Fluent;
 
 namespace EMSI_Corporation.Controllers
 {
@@ -19,7 +21,34 @@ namespace EMSI_Corporation.Controllers
         {
             var extintores = await _appDBContext.Extintores.ToListAsync();
             return View(extintores);
-            //hola
+        }
+
+        [HttpGet]
+        public IActionResult VerPDF()
+        {
+            var pdf = new InventarioPDF(_appDBContext);
+            var documento = pdf.CreatePDF();
+
+            var stream = new MemoryStream();
+            documento.GeneratePdf(stream);
+            stream.Position = 0;
+
+            // Visualizar en navegador
+            return File(stream, "application/pdf");
+        }
+
+        [HttpGet]
+        public IActionResult DescargarPDF()
+        {
+            var pdf = new InventarioPDF(_appDBContext);
+            var documento = pdf.CreatePDF();
+
+            var stream = new MemoryStream();
+            documento.GeneratePdf(stream);
+            stream.Position = 0;
+
+            // Forzar descarga
+            return File(stream, "application/pdf", "InventarioExtintores.pdf");
         }
     }
 }

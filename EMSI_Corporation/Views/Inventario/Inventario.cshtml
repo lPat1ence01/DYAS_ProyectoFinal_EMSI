@@ -65,5 +65,16 @@
                 </div>
             }
         </div>
+        @if (Model != null && Model.Any())
+        {
+            <div class="mb-3 text-end">
+                <a href="@Url.Action("VerPDF","Inventario")" target="_blank" class="btn btn-outline-primary me-2">
+                    <i class="bi bi-eye"></i> Ver PDF
+                </a>
+                <a href="@Url.Action("DescargarPDF", "Inventario")" class="btn btn-outline-success">
+                    <i class="bi bi-download"></i> Descargar PDF
+                </a>
+            </div>
+        }
     </div>
 </div>
