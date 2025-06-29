@@ -17,7 +17,13 @@ namespace EMSI_Corporation.Controllers
         public IActionResult Index()
         {
             var ventas = _appDBContext.Ventas.ToList();
-            return View();
+            for (int i = 0; i < ventas.Count; i++)
+            {
+                ventas[i].Cliente = _appDBContext.Clientes.Find(ventas[i].Cliente_ID);
+                ventas[i].Empleado = _appDBContext.empleados.Find(ventas[i].Empleado_ID);
+            }
+
+            return View(ventas);
         }
         [HttpGet]
         public IActionResult Registrar(int idExtintor)
