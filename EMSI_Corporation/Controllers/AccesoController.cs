@@ -31,56 +31,62 @@ namespace EMSI_Corporation.Controllers
         {
             return View();
         }
-        /*
         [HttpPost]
         public async Task<IActionResult> Login(LoginVM modelo)
         {
-            var usuario = await _appDBContext.usuarios
-                .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Rol)
-                .FirstOrDefaultAsync(u => u.Correo.Trim().ToLower() == modelo.Correo.Trim().ToLower());
+            return RedirectToAction("Index", "Home");
+        }
 
-            if (usuario == null)
+            /*
+            [HttpPost]
+            public async Task<IActionResult> Login(LoginVM modelo)
             {
-                ModelState.AddModelError(string.Empty, "El usuario no existe.");
-                return View();
-            }
+                var usuario = await _appDBContext.usuarios
+                    .Include(u => u.UserRoles)
+                        .ThenInclude(ur => ur.Rol)
+                    .FirstOrDefaultAsync(u => u.Correo.Trim().ToLower() == modelo.Correo.Trim().ToLower());
 
-            var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.Contraseña, modelo.Password);
+                if (usuario == null)
+                {
+                    ModelState.AddModelError(string.Empty, "El usuario no existe.");
+                    return View();
+                }
 
-            if (resultado == PasswordVerificationResult.Failed)
-            {
-                ModelState.AddModelError(string.Empty, "Contraseña incorrecta.");
-                return View();
-            }
+                var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.Contraseña, modelo.Password);
 
-            // Suponiendo que un usuario puede tener varios roles, tomamos el primero
-            var rolUsuario = usuario.UserRoles.FirstOrDefault()?.Rol?.Nombre ?? "Usuario";
+                if (resultado == PasswordVerificationResult.Failed)
+                {
+                    ModelState.AddModelError(string.Empty, "Contraseña incorrecta.");
+                    return View();
+                }
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, usuario.IDUsuario.ToString()),
-                new Claim(ClaimTypes.Name, usuario.Nombre),
-                new Claim(ClaimTypes.Email, usuario.Correo),
-                new Claim(ClaimTypes.Role, rolUsuario)
-            };
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                // Suponiendo que un usuario puede tener varios roles, tomamos el primero
+                var rolUsuario = usuario.UserRoles.FirstOrDefault()?.Rol?.Nombre ?? "Usuario";
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, usuario.IDUsuario.ToString()),
+                    new Claim(ClaimTypes.Name, usuario.Nombre),
+                    new Claim(ClaimTypes.Email, usuario.Correo),
+                    new Claim(ClaimTypes.Role, rolUsuario)
+                };
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-            if (rolUsuario == "Administrador")
-            {
-                return RedirectToAction("Index", "Usuarios");
-            }
-            else
-            {
-                return RedirectToAction("Index", "Articulos");
-            }
-            return View(usuario);
-        }*/
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 
-        [HttpGet]
+                if (rolUsuario == "Administrador")
+                {
+                    return RedirectToAction("Index", "Usuarios");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Articulos");
+                }
+                return View(usuario);
+            }*/
+
+            [HttpGet]
         public IActionResult Mantenimiento()
         {
             return View();

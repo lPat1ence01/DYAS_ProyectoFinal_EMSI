@@ -25,6 +25,15 @@ namespace EMSI_Corporation.Controllers
 
             return View(ventas);
         }
+
+        public IActionResult VentasPorId(int id)
+        {
+            var Extintor = _appDBContext.Extintores.Find(id);
+            Venta vent = Extintor.Venta;
+            ViewBag.ExtintorId = id;
+            return View(vent);
+        }
+
         [HttpGet]
         public IActionResult Registrar(int idExtintor)
         {
