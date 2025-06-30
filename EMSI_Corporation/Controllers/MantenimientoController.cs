@@ -23,7 +23,7 @@ namespace EMSI_Corporation.Controllers
         public IActionResult Registrar(int id)
         {
             Extintor? ext = _appDBContext.Extintores.Find(id);
-            if(ext == null || ext.Venta_ID == null)
+            if(false)
             {
                 var Mantenimientos = _appDBContext.Mantenimientos.Where(m => m.Extintor_ID == id).ToList();
 
@@ -32,13 +32,16 @@ namespace EMSI_Corporation.Controllers
             }
             else
             {
+                Venta v = _appDBContext.Ventas.Find(ext.Venta_ID);
+                ext.Venta = v;
+                /*d
                 Empleado em = ext.Venta.Empleado;
                 Cliente cli = ext.Venta.Cliente;
-
+                */
                 ClienteTrabajadorVM ct = new ClienteTrabajadorVM
                 {
-                    cliente = cli,
-                    empleado = em
+                    cliente = v.Cliente,
+                    empleado = v.Empleado
                 };
 
                 return View("Registrar", ct);

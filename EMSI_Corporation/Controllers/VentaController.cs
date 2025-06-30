@@ -39,6 +39,7 @@ namespace EMSI_Corporation.Controllers
         {
             ViewBag.clientes = _appDBContext.Clientes.ToList();
             ViewBag.empleados = _appDBContext.empleados.ToList();
+            ViewBag.Extintor_ID = idExtintor;
             return View();
         }
 
@@ -79,6 +80,12 @@ namespace EMSI_Corporation.Controllers
                 };
                 _appDBContext.Ventas.Add(venta);
                 _appDBContext.SaveChanges();
+
+                Extintor ext = _appDBContext.Extintores.Find(ventaVM.Extintor_ID);
+                ext.Venta_ID = venta.IdVenta;
+                _appDBContext.Extintores.Update(ext);
+                _appDBContext.SaveChanges();
+
                 return RedirectToAction(nameof(Index));
             }
             catch

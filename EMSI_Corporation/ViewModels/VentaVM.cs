@@ -14,5 +14,8 @@ namespace EMSI_Corporation.ViewModels
 
         public int Empleado_ID { get; set; }
         public Empleado Empleado { get; set; }
+
+        public int Extintor_ID { get; set; }
+        public Extintor Extintor { get; set; }
     }
 }
