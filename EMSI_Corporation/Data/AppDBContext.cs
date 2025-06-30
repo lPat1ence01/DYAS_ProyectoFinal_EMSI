@@ -253,9 +253,9 @@ namespace EMSI_Corporation.Data
             {
                 tb.HasKey(rs => rs.IdReporte);
                 tb.Property(rs => rs.IdReporte).UseIdentityColumn().ValueGeneratedOnAdd();
-                tb.Property(rs => rs.FirmaCliente).HasColumnType("VARBINARY(MAX)").IsRequired();
+                tb.Property(rs => rs.FirmaCliente).HasColumnType("VARBINARY(MAX)");
                 tb.Property(rs => rs.Observaciones).IsRequired();
-                tb.Property(rs => rs.ImgEvidencia).HasColumnType("VARBINARY(MAX)").IsRequired();
+                tb.Property(rs => rs.ImgEvidencia).HasColumnType("VARBINARY(MAX)");
 
                 tb.HasOne(rs => rs.Cliente)
                     .WithMany()
