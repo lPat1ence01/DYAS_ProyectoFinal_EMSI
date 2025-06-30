@@ -45,22 +45,49 @@ namespace EMSI_Corporation.Controllers
         [HttpPost]
         public IActionResult Registrar(VentaVM ventaVM)
         {
-            Cliente? cli = _appDBContext.Clientes.Find(ventaVM.Cliente_ID);
-            Empleado? empleado = _appDBContext.empleados.Find(ventaVM.Empleado_ID);
-
-            Venta venta = new Venta
+            /*
+            int hola = 0;
+            if(int.TryParse(ventaVM.MetodoPago, out hola))
             {
-                Cliente = cli,
-                Cliente_ID = ventaVM.Cliente_ID,
-                Empleado = empleado,
-                Empleado_ID = ventaVM.Empleado_ID,
-                FechaVenta = ventaVM.FechaVenta,
-                MetodoPago = ventaVM.MetodoPago,
-                Total = ventaVM.Total
-            };
-            _appDBContext.Ventas.Add(venta);
-            _appDBContext.SaveChanges();
-            return RedirectToAction(nameof(Index));
+                ViewBag.clientes = _appDBContext.Clientes.ToList();
+                ViewBag.empleados = _appDBContext.empleados.ToList();
+                ViewData["error"] = "Datos incorrectos";
+                return View();
+
+            }
+            */
+            try
+            {
+                int hola = 0;
+                if (int.TryParse(ventaVM.MetodoPago, out hola))
+                {
+                    throw new Exception();
+
+                }
+                Cliente? cli = _appDBContext.Clientes.Find(ventaVM.Cliente_ID);
+                Empleado? empleado = _appDBContext.empleados.Find(ventaVM.Empleado_ID);
+
+                Venta venta = new Venta
+                {
+                    Cliente = cli,
+                    Cliente_ID = ventaVM.Cliente_ID,
+                    Empleado = empleado,
+                    Empleado_ID = ventaVM.Empleado_ID,
+                    FechaVenta = ventaVM.FechaVenta,
+                    MetodoPago = ventaVM.MetodoPago,
+                    Total = ventaVM.Total
+                };
+                _appDBContext.Ventas.Add(venta);
+                _appDBContext.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                ViewBag.clientes = _appDBContext.Clientes.ToList();
+                ViewBag.empleados = _appDBContext.empleados.ToList();
+                ViewData["error"] = "Datos incorrectos";
+                return View();
+            }
         }
     }
 }
