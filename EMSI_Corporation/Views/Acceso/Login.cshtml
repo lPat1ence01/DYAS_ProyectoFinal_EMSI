@@ -13,40 +13,47 @@
 
 <!-- CODIGO HTML -->
 <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Login</title>
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="~/css/loginStyle.css" asp-append-version="true" />
-    </head>
-    <body class="login-body">
-        <div class="sqr-anim"></div>
-        <!--Contenedor Principal-->
-        <div class="container">
-            <!--Panel Izquierdo-->
-            <div class="panel-izquierdo">
-                <img src="~/Imagenes/EMSI_logo.png" />
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/loginStyle.css" asp-append-version="true" />
+</head>
+<body class="login-body">
+    <div class="sqr-anim"></div>
+    <!--Contenedor Principal-->
+    <div class="container">
+        <!--Panel Izquierdo-->
+        <div class="panel-izquierdo">
+            <img src="~/Imagenes/EMSI_logo.png" />
+        </div>
+        <!--Panel Derecho-->
+        <div class="panel-derecho">
+            <div class="Titulo">
+                LOGIN
             </div>
-            <!--Panel Derecho-->
-            <div class="panel-derecho">
-                <div class="Titulo">
-                    LOGIN
-                </div>
-                <div class="cuerpo">
+            <div class="cuerpo">
+                <div asp-validation-summary="All" class="text-danger text-center mb-2"></div>
                 <form asp-controller="Acceso" asp-action="Login" method="post" class="formulario">
                     <label>Usuario</label>
                     <input class="form_input" type="text" placeholder="Ingresar Usuario" required asp-for="Username" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+
                     <label>Contraseña</label>
                     <input class="form_input" type="password" placeholder="Ingresar Contraseña" required asp-for="Password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
 
                     <div class="boton_ingresar">
                         <button>Ingresar</button>
                     </div>
                 </form>
-                </div>
             </div>
         </div>
-    </body>
-    </html>
+    </div>
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>

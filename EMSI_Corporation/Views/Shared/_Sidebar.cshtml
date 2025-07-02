@@ -97,10 +97,13 @@
             </li>
         </ul>
         <div class="sidebar-footer">
-            <a href="" class="sidebar-link">
-                <i class="lni lni-exit"></i>
-                <span>Logout</span>
-            </a>
+            <form asp-controller="Acceso" asp-action="Logout" method="post" class="w-100">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="sidebar-link btn btn-link text-start w-100 p-0" style="text-decoration: none;">
+                    <i class="lni lni-exit"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
         </div>
     </aside>
 </div>

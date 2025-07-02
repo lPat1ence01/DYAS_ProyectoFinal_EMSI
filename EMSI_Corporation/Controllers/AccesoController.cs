@@ -2,12 +2,12 @@
 using EMSI_Corporation.Models;
 using EMSI_Corporation.ViewModels;
 using Microsoft.EntityFrameworkCore;
-
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Http.Headers;
 using OfficeOpenXml;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace EMSI_Corporation.Controllers
 {
+    [Authorize] // Esto asegura que solo usuarios autenticados puedan acceder al resto de acciones
     public class AccesoController : Controller
     {
         private readonly AppDBContext _appDBContext;
@@ -26,67 +27,73 @@ namespace EMSI_Corporation.Controllers
             _passwordHasher = new PasswordHasher<Usuario>();
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Acceso");
+        }
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
         {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Stakeholders_Empleado", "Acceso");
+            }
+
             return View();
         }
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login(LoginVM modelo)
         {
-            return RedirectToAction("Index", "Home");
+            if (!ModelState.IsValid)
+            {
+                return View(modelo);
+            }
+
+            var usuario = await _appDBContext.usuarios
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Rol)
+                .FirstOrDefaultAsync(u => u.usuario.Trim().ToLower() == modelo.Username.Trim().ToLower());
+
+            if (usuario == null)
+            {
+                ModelState.AddModelError(string.Empty, "El usuario no existe.");
+                return View(modelo);
+            }
+
+            var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.password, modelo.Password);
+
+            if (resultado == PasswordVerificationResult.Failed)
+            {
+                ModelState.AddModelError(string.Empty, "Contraseña incorrecta.");
+                return View(modelo);
+            }
+
+            var rolUsuario = usuario.UserRoles.FirstOrDefault()?.Rol?.nomRol ?? "Empleado";
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
+                new Claim(ClaimTypes.Name, usuario.usuario),
+                new Claim(ClaimTypes.Role, rolUsuario)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+
+            return RedirectToAction("Index", "Home"); // Cambia a donde quieras redirigir después del login
         }
 
-            /*
-            [HttpPost]
-            public async Task<IActionResult> Login(LoginVM modelo)
-            {
-                var usuario = await _appDBContext.usuarios
-                    .Include(u => u.UserRoles)
-                        .ThenInclude(ur => ur.Rol)
-                    .FirstOrDefaultAsync(u => u.Correo.Trim().ToLower() == modelo.Correo.Trim().ToLower());
 
-                if (usuario == null)
-                {
-                    ModelState.AddModelError(string.Empty, "El usuario no existe.");
-                    return View();
-                }
 
-                var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.Contraseña, modelo.Password);
-
-                if (resultado == PasswordVerificationResult.Failed)
-                {
-                    ModelState.AddModelError(string.Empty, "Contraseña incorrecta.");
-                    return View();
-                }
-
-                // Suponiendo que un usuario puede tener varios roles, tomamos el primero
-                var rolUsuario = usuario.UserRoles.FirstOrDefault()?.Rol?.Nombre ?? "Usuario";
-
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, usuario.IDUsuario.ToString()),
-                    new Claim(ClaimTypes.Name, usuario.Nombre),
-                    new Claim(ClaimTypes.Email, usuario.Correo),
-                    new Claim(ClaimTypes.Role, rolUsuario)
-                };
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
-
-                if (rolUsuario == "Administrador")
-                {
-                    return RedirectToAction("Index", "Usuarios");
-                }
-                else
-                {
-                    return RedirectToAction("Index", "Articulos");
-                }
-                return View(usuario);
-            }*/
-
-            [HttpGet]
+        [HttpGet]
         public IActionResult Mantenimiento()
         {
             return View();
@@ -252,12 +259,49 @@ namespace EMSI_Corporation.Controllers
         }
 
         [HttpPost]
-        public IActionResult CrearEmpleado(Empleado empleado)
+        [ValidateAntiForgeryToken]
+        public IActionResult CrearEmpleado(IFormCollection form)
         {
+            // Captura datos del formulario
+            var empleado = new Empleado
+            {
+                nomEmpleado = form["nomEmpleado"],
+                apeEmpleado = form["apeEmpleado"],
+                dni = form["dni"],
+                gmail = form["gmail"],
+                numCelular = form["numCelular"]
+            };
+
             _appDBContext.empleados.Add(empleado);
             _appDBContext.SaveChanges();
-            return RedirectToAction(nameof(Stakeholders_Empleado));
+
+            // Crea el usuario asociado
+            var usuario = new Usuario
+            {
+                usuario = form["usuario"],
+                password = new PasswordHasher<Usuario>().HashPassword(null, form["password"]),
+                IdEmpleado = empleado.IdEmpleado
+            };
+
+            _appDBContext.usuarios.Add(usuario);
+            _appDBContext.SaveChanges();
+
+            // Asignar el rol automáticamente (Empleado)
+            var rolEmpleado = _appDBContext.Roles.FirstOrDefault(r => r.nomRol == "Empleado");
+            if (rolEmpleado != null)
+            {
+                _appDBContext.UserRoles.Add(new User_Rol
+                {
+                    IdUsuario = usuario.IdUsuario,
+                    IdRol = rolEmpleado.IdRol
+                });
+                _appDBContext.SaveChanges();
+            }
+
+            TempData["Success"] = "Empleado registrado correctamente.";
+            return RedirectToAction("Stakeholders_Empleado");
         }
+
 
         //Editar
         [HttpGet]
@@ -311,8 +355,8 @@ namespace EMSI_Corporation.Controllers
             worksheet.Cell("A1").Value = "Hello World 2!";
             worksheet.Cell("A2").FormulaA1 = "MID(A1, 7, 5)";
             workbook.Save();*/
-            
-            return View("Mantenimiento",cliente_trabajador);
+
+            return View("Mantenimiento", cliente_trabajador);
         }
 
         [HttpGet]
@@ -357,7 +401,7 @@ namespace EMSI_Corporation.Controllers
             
         }*/
 
-        
+
         /*
         [HttpPost]
         public IActionResult UploadNewProd()//falta VM
