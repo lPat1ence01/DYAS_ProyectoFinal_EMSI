@@ -3,12 +3,14 @@ using EMSI_Corporation.Views.Inventario;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace EMSI_Corporation.Controllers
 {
     public class InventarioController : Controller
     {
-
         private readonly AppDBContext _appDBContext;
 
         public InventarioController(AppDBContext appDBContext)
@@ -26,29 +28,42 @@ namespace EMSI_Corporation.Controllers
         [HttpGet]
         public IActionResult VerPDF()
         {
-            var pdf = new InventarioPDF(_appDBContext);
-            var documento = pdf.CreatePDF();
+            try
+            {
+                var pdf = new InventarioPDF(_appDBContext);
+                var documento = pdf.CreatePDF();
 
-            var stream = new MemoryStream();
-            documento.GeneratePdf(stream);
-            stream.Position = 0;
+                var stream = new MemoryStream();
+                documento.GeneratePdf(stream);
+                stream.Position = 0;
 
-            // Visualizar en navegador
-            return File(stream, "application/pdf");
+                return File(stream, "application/pdf");
+            }
+            catch (Exception ex)
+            {
+                return Content("⚠️ Error generando PDF: " + ex.Message);
+            }
         }
 
         [HttpGet]
         public IActionResult DescargarPDF()
         {
-            var pdf = new InventarioPDF(_appDBContext);
-            var documento = pdf.CreatePDF();
+            try
+            {
+                var pdf = new InventarioPDF(_appDBContext);
+                var documento = pdf.CreatePDF();
 
-            var stream = new MemoryStream();
-            documento.GeneratePdf(stream);
-            stream.Position = 0;
+                var stream = new MemoryStream();
+                documento.GeneratePdf(stream);
+                stream.Position = 0;
 
-            // Forzar descarga
-            return File(stream, "application/pdf", "InventarioExtintores.pdf");
+                // Forzar la descarga del PDF
+                return File(stream, "application/pdf", "InventarioExtintores.pdf");
+            }
+            catch (Exception ex)
+            {
+                return Content("⚠️ Error generando PDF: " + ex.Message);
+            }
         }
     }
 }

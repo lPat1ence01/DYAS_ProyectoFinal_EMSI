@@ -20,84 +20,77 @@ namespace EMSI_Corporation.Views.Inventario
         public IDocument CreatePDF()
         {
             var extintores = _context.Extintores.ToList();
+            string rojoCorporativo = "#B20000";
 
             return Document.Create(container =>
             {
                 container.Page(page =>
                 {
+                    page.Margin(30);
+                    page.Size(PageSizes.A4);
+
                     // CABECERA
-                    page.Header().Row(row =>
+                    page.Header().Column(header =>
                     {
-                        row.ConstantItem(140).Border(1).Height(60).Placeholder();
-
-                        row.RelativeItem().Border(1).Column(col =>
-                        {
-                            col.Item().AlignCenter().Text("Existencia").Bold().FontSize(14);
-                            col.Item().AlignCenter().Text("Almacén Principal").FontSize(9);
-                            col.Item().AlignCenter().Text(DateTime.Now.ToString("dd/MM/yyyy")).FontSize(9).Italic();
-                        });
-
-                        row.RelativeItem().Column(col =>
-                        {
-                            col.Item().AlignCenter().Text("CORPORACIÓN EMSI").Bold().FontSize(14);
-                            col.Item().AlignCenter().Text("Mza. B Lote. 14 Pp.Jj Baños Punta").FontSize(9);
-                            col.Item().AlignCenter().Text("964214945 / 944259981").FontSize(9);
-                            col.Item().AlignCenter().Text("corporacion.emsi@gmail.com").FontSize(9);
-                        });
+                        header.Item().AlignCenter().Text("INVENTARIO DE EXTINTORES")
+                            .FontSize(18).Bold().FontColor(rojoCorporativo);
+                        header.Item().AlignCenter().Text("CORPORACIÓN EMSI")
+                            .FontSize(12).FontColor(Colors.Grey.Darken3);
+                        header.Item().AlignCenter().Text("Mza. B Lote. 14 Pp.Jj Baños Punta")
+                            .FontSize(10);
+                        header.Item().AlignCenter().Text("964214945 / 944259981 - corporacion.emsi@gmail.com")
+                            .FontSize(10);
                     });
 
-                    // CUERPO CON TABLA
-                    page.Content().Table(table =>
+                    // TABLA
+                    page.Content().PaddingVertical(20).Table(table =>
                     {
-                        // ENCABEZADO
                         table.ColumnsDefinition(columns =>
                         {
-                            columns.RelativeColumn(); // ID
-                            columns.RelativeColumn(); // Tipo Agente
-                            columns.RelativeColumn(); // Clase Fuego
-                            columns.RelativeColumn(); // Capacidad
-                            columns.RelativeColumn(); // Vencimiento
-                            columns.RelativeColumn(); // Estado
+                            columns.RelativeColumn(1); // ID
+                            columns.RelativeColumn(2); // Tipo Agente
+                            columns.RelativeColumn(2); // Clase Fuego
+                            columns.RelativeColumn(2); // Capacidad
+                            columns.RelativeColumn(2); // Cantidad
                         });
 
+                        // ENCABEZADO
                         table.Header(header =>
                         {
-                            header.Cell().Element(CellStyle).Text("ID").Bold();
-                            header.Cell().Element(CellStyle).Text("Tipo de Agente").Bold();
-                            header.Cell().Element(CellStyle).Text("Clase de Fuego").Bold();
-                            header.Cell().Element(CellStyle).Text("Capacidad (KG)").Bold();
-                            header.Cell().Element(CellStyle).Text("Vencimiento").Bold();
-                            header.Cell().Element(CellStyle).Text("Estado").Bold();
+                            header.Cell().Element(CellHeaderStyle).Text("ID").Bold();
+                            header.Cell().Element(CellHeaderStyle).Text("Tipo de Agente").Bold();
+                            header.Cell().Element(CellHeaderStyle).Text("Clase de Fuego").Bold();
+                            header.Cell().Element(CellHeaderStyle).Text("Capacidad (KG)").Bold();
+                            header.Cell().Element(CellHeaderStyle).Text("Cantidad").Bold();
 
-                            static IContainer CellStyle(IContainer container)
-                            {
-                                return container.DefaultTextStyle(x => x.FontSize(10))
-                                                .PaddingVertical(5)
-                                                .AlignCenter()
-                                                .Background(Colors.Grey.Lighten2)
-                                                .BorderBottom(1);
-                            }
+                            static IContainer CellHeaderStyle(IContainer container) =>
+                                container.DefaultTextStyle(x => x.FontSize(11).Bold().FontColor(Colors.White))
+                                         .Background("#B20000")
+                                         .AlignCenter()
+                                         .PaddingVertical(6)
+                                         .BorderBottom(1);
                         });
 
-                        // FILAS DE EXTINTORES
+                        // FILAS DE DATOS
                         foreach (var ext in extintores)
                         {
-                            table.Cell().Element(CellStyle).Text(ext.IdExtintor.ToString());
-                            table.Cell().Element(CellStyle).Text(ext.TipoAgente);
-                            table.Cell().Element(CellStyle).Text(ext.ClaseFuego);
-                            table.Cell().Element(CellStyle).Text($"{ext.CapacidadKG} KG");
-                            table.Cell().Element(CellStyle).Text(ext.FechaVencimiento.ToString("yyyy-MM-dd"));
-                            table.Cell().Element(CellStyle).Text(ext.Estado);
+                            table.Cell().Element(CellBodyStyle).Text(ext.IdExtintor.ToString());
+                            table.Cell().Element(CellBodyStyle).Text(ext.TipoAgente);
+                            table.Cell().Element(CellBodyStyle).Text(ext.ClaseFuego);
+                            table.Cell().Element(CellBodyStyle).Text($"{ext.CapacidadKG} KG");
+                            table.Cell().Element(CellBodyStyle).Text(ext.CantidadDisponible.ToString());
 
-                            static IContainer CellStyle(IContainer container)
-                            {
-                                return container.DefaultTextStyle(x => x.FontSize(9))
-                                                .PaddingVertical(3)
-                                                .AlignCenter()
-                                                .BorderBottom(0.5f);
-                            }
+                            static IContainer CellBodyStyle(IContainer container) =>
+                                container.DefaultTextStyle(x => x.FontSize(10).FontColor(Colors.Grey.Darken3))
+                                         .PaddingVertical(4)
+                                         .AlignCenter()
+                                         .BorderBottom(0.5f);
                         }
                     });
+
+                    // PIE DE PÁGINA
+                    page.Footer().AlignCenter().Text($"Generado el {DateTime.Now:dd/MM/yyyy HH:mm}")
+                        .FontSize(9).Italic().FontColor(Colors.Grey.Darken1);
                 });
             });
         }

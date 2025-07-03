@@ -6,7 +6,7 @@
 
 <div class="container mt-5">
     <div class="card shadow-lg">
-        <div class="card-header bg-gradient text-white" style="background: linear-gradient(90deg, #0d6efd, #6610f2);">
+        <div class="card-header text-white" style="background: linear-gradient(90deg, #dc3545, #8b0000);">
             <h3 class="mb-0">Inventario de Extintores</h3>
         </div>
         <div class="card-body">
@@ -62,26 +62,28 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Botones de PDF -->
+                <div class="mt-4 text-end">
+                    <a href="@Url.Action("VerPDF", "Inventario")" target="_blank" class="btn btn-outline-primary me-2">
+                        <i class="bi bi-eye"></i> Ver PDF
+                    </a>
+                    <a href="@Url.Action("DescargarPDF", "Inventario")" class="btn btn-outline-success">
+                        <i class="bi bi-download"></i> Descargar PDF
+                    </a>
+                </div>
             }
             else
             {
-                <a asp-controller="Recepcion" asp-action="Index">Registrar Recepción</a>
                 <div class="alert alert-warning text-center" role="alert">
                     No hay extintores registrados en el inventario.
                 </div>
+                <div class="text-center mt-3">
+                    <a asp-controller="Recepcion" asp-action="Index" class="btn btn-outline-danger">
+                        Registrar Recepción
+                    </a>
+                </div>
             }
         </div>
-
-        @if (Model != null && Model.Any())
-        {
-            <div class="mb-3 text-end">
-                <a href="@Url.Action("VerPDF","Inventario")" target="_blank" class="btn btn-outline-primary me-2">
-                    <i class="bi bi-eye"></i> Ver PDF
-                </a>
-                <a href="@Url.Action("DescargarPDF", "Inventario")" class="btn btn-outline-success">
-                    <i class="bi bi-download"></i> Descargar PDF
-                </a>
-            </div>
-        }
     </div>
 </div>
