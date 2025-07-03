@@ -41,7 +41,7 @@ namespace EMSI_Corporation.Controllers
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Stakeholders_Empleado", "Acceso");
+                return RedirectToAction("Index", "Home");
             }
 
             return View();

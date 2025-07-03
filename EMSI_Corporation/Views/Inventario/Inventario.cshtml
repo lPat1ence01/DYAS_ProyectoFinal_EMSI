@@ -20,6 +20,7 @@
                                 <th>Tipo de Agente</th>
                                 <th>Clase de Fuego</th>
                                 <th>Capacidad (KG)</th>
+                                <th>Cantidad Disponible</th>
                                 <th>Fecha de Vencimiento</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
@@ -33,6 +34,9 @@
                                     <td>@ext.TipoAgente</td>
                                     <td>@ext.ClaseFuego</td>
                                     <td>@ext.CapacidadKG</td>
+                                    <td>
+                                        <span class="fw-bold text-primary">@ext.CantidadDisponible</span>
+                                    </td>
                                     <td>@ext.FechaVencimiento.ToString("yyyy-MM-dd")</td>
                                     <td>
                                         @if (ext.Estado == "Operativo")
@@ -49,7 +53,9 @@
                                         }
                                     </td>
                                     <td>
-                                        <a class="btn btn-sm btn-warning" asp-controller="Mantenimiento" asp-action="Index" asp-route-id=@ext.IdExtintor>Ver mantenimientos</a>
+                                        <a class="btn btn-sm btn-warning" asp-controller="Mantenimiento" asp-action="Index" asp-route-id="@ext.IdExtintor">
+                                            Ver mantenimientos
+                                        </a>
                                     </td>
                                 </tr>
                             }
@@ -65,6 +71,7 @@
                 </div>
             }
         </div>
+
         @if (Model != null && Model.Any())
         {
             <div class="mb-3 text-end">

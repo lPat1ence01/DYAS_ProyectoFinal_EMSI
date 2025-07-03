@@ -156,6 +156,7 @@ namespace EMSI_Corporation.Data
                 tb.Property(e => e.TipoAgente).HasMaxLength(50).IsRequired();
                 tb.Property(e => e.ClaseFuego).HasMaxLength(50).IsRequired();
                 tb.Property(e => e.CapacidadKG).HasColumnType("decimal(5,2)").IsRequired();
+                tb.Property(e => e.CantidadDisponible).IsRequired();
                 tb.Property(e => e.FechaVencimiento).IsRequired();
                 tb.Property(e => e.Estado).HasMaxLength(50).IsRequired();
 

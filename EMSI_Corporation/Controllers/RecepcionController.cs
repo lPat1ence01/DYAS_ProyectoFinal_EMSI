@@ -1,80 +1,92 @@
-﻿using EMSI_Corporation.Data;
+﻿using EMSI_Corporation.ViewModels;
 using EMSI_Corporation.Models;
-using EMSI_Corporation.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using EMSI_Corporation.Data;
 
-namespace EMSI_Corporation.Controllers
+public class RecepcionController : Controller
 {
-    public class RecepcionController : Controller
+    private readonly AppDBContext _appDBContext;
+
+    public RecepcionController(AppDBContext appDBContext)
     {
-        private readonly AppDBContext _appDBContext;
+        _appDBContext = appDBContext;
+    }
 
-        public RecepcionController(AppDBContext appDBContext)
+    //Ventana Principal
+    [HttpGet]
+    public IActionResult Index()
+    {
+        var proovedores = _appDBContext.Provedor.ToList();
+        ViewBag.Proovedores = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(proovedores, "IdProovedor", "RazonSocial");
+        return View();
+    }
+
+    //Realizar recepción
+    [HttpGet]
+    public IActionResult CrearRecepcion()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CrearRecepcion(DateTime Fecha, int ProovedorId)
+    {
+        var nuevaRecepcion = new Recepcion
         {
-            _appDBContext = appDBContext;
-        }
+            Fecha = Fecha,
+            ProovedorId = ProovedorId
+        };
 
+        _appDBContext.Recepcion.Add(nuevaRecepcion);
+        await _appDBContext.SaveChangesAsync();
 
-        //Ventana Principal
-        [HttpGet]
-        public IActionResult Index()
+        // Redirigir a la vista donde se registran los extintores, pasando el ID de la nueva recepción
+        return RedirectToAction("CrearRecepcionAgrupada", new { recepcionId = nuevaRecepcion.IdRecepcion });
+    }
+
+    // GET: Mostrar formulario de recepción agrupada
+    [HttpGet]
+    public IActionResult CrearRecepcionAgrupada()
+    {
+        return View();
+    }
+
+    // POST: Procesar la recepción agrupada
+    [HttpPost]
+    public async Task<IActionResult> RecepcionarAgrupado(List<RecepcionVM> listaRecepcion)
+    {
+        foreach (var item in listaRecepcion)
         {
-            var proovedores = _appDBContext.Provedor.ToList();
-            ViewBag.Proovedores = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(proovedores, "IdProovedor", "RazonSocial");
-            return View();
-        }
+            var extintorExistente = await _appDBContext.Extintores.FirstOrDefaultAsync(e =>
+                e.TipoAgente == item.TipoAgente &&
+                e.ClaseFuego == item.ClaseFuego &&
+                e.CapacidadKG == item.CapacidadKG &&
+                e.Estado == "Operativo"
+            );
 
-        //Realizar recepción
-        [HttpGet]
-        public IActionResult CrearRecepcion()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CrearRecepcion(DateTime Fecha, int ProovedorId)
-        {
-            var nuevaRecepcion = new Recepcion
+            if (extintorExistente != null)
             {
-                Fecha = Fecha,
-                ProovedorId = ProovedorId
-            };
+                extintorExistente.CantidadDisponible += item.Cantidad;
+                _appDBContext.Extintores.Update(extintorExistente);
+            }
+            else
+            {
+                var nuevoExtintor = new Extintor
+                {
+                    TipoAgente = item.TipoAgente,
+                    ClaseFuego = item.ClaseFuego,
+                    CapacidadKG = item.CapacidadKG,
+                    CantidadDisponible = item.Cantidad,
+                    FechaVencimiento = item.FechaVencimiento,
+                    Estado = "Operativo"
+                };
 
-            _appDBContext.Recepcion.Add(nuevaRecepcion);
-            await _appDBContext.SaveChangesAsync();
-
-            // Redirigir a la vista donde se registran los extintores, pasando el ID de la nueva recepción
-            return RedirectToAction("RegistrarExtintores", new { recepcionId = nuevaRecepcion.IdRecepcion });
+                _appDBContext.Extintores.Add(nuevoExtintor);
+            }
         }
 
-        //Registrar Extintor
-        [HttpGet]
-        public IActionResult RegistrarExtintores(int recepcionId)
-        {
-            ViewBag.RecepcionId = recepcionId;
-
-            var extintores = _appDBContext.Extintores
-                .Where(e => e.RecepcionId == recepcionId)
-                .ToList();
-
-            ViewBag.Extintores = extintores;
-
-            return View();
-        }
-
-
-
-        [HttpPost]
-        public async Task<IActionResult> GuardarExtintor(Extintor extintor)
-        {
-            _appDBContext.Extintores.Add(extintor);
-            await _appDBContext.SaveChangesAsync();
-
-            // Regresar a la misma vista para registrar más extintores si se desea
-            return RedirectToAction("RegistrarExtintores", new { recepcionId = extintor.RecepcionId });
-        }
-
-
+        await _appDBContext.SaveChangesAsync();
+        return RedirectToAction("Index"); // o donde desees redirigir luego
     }
 }

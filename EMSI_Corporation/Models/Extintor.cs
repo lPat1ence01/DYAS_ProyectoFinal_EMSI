@@ -11,6 +11,7 @@ namespace EMSI_Corporation.Models
         public string TipoAgente { get; set; }
         public string ClaseFuego { get; set; }
         public decimal CapacidadKG { get; set; }
+        public int CantidadDisponible { get; set; }
         public DateTime FechaVencimiento { get; set; }
         public string Estado { get; set; }
 

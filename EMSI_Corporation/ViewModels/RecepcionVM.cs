@@ -2,7 +2,10 @@
 {
     public class RecepcionVM
     {
-        public DateTime Fecha { get; set; }
-        public int ProovedorId { get; set; }
+        public string TipoAgente { get; set; }
+        public string ClaseFuego { get; set; }
+        public decimal CapacidadKG { get; set; }
+        public int Cantidad { get; set; }
+        public DateTime FechaVencimiento { get; set; }
     }
 }
