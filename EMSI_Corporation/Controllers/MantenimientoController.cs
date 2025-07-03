@@ -17,15 +17,21 @@ namespace EMSI_Corporation.Controllers
         {
             var Extintor = _appDBContext.Extintores.Find(id);
             var Mantenimientos = _appDBContext.Mantenimientos.Where(m => m.Extintor_ID == id).ToList();
+            for (int i = 0; i < Mantenimientos.Count; i++)
+            {
+                Mantenimientos[i].Empleado = _appDBContext.empleados.Find(Mantenimientos[i].Empleado_ID);
+                Mantenimientos[i].Extintor = _appDBContext.Extintores.Find(Mantenimientos[i].Extintor_ID);
+            }
             ViewBag.ExtintorId = id;
             return View(Mantenimientos);
         }
         public IActionResult Registrar(int id)
         {
             Extintor? ext = _appDBContext.Extintores.Find(id);
-            if(false)
+            var Mantenimientos = _appDBContext.Mantenimientos.Where(m => m.Extintor_ID == id).ToList();
+            if (false)
             {
-                var Mantenimientos = _appDBContext.Mantenimientos.Where(m => m.Extintor_ID == id).ToList();
+
 
                 Index(id);
                 return View("Index");
@@ -34,20 +40,104 @@ namespace EMSI_Corporation.Controllers
             {
                 Venta v = _appDBContext.Ventas.Find(ext.Venta_ID);
                 ext.Venta = v;
-                /*d
-                Empleado em = ext.Venta.Empleado;
-                Cliente cli = ext.Venta.Cliente;
-                */
+
+                Empleado em = _appDBContext.empleados.Find(v.Empleado_ID);
+                Cliente cli = _appDBContext.Clientes.Find(v.Cliente_ID);
+
                 ClienteTrabajadorVM ct = new ClienteTrabajadorVM
                 {
-                    cliente = v.Cliente,
-                    empleado = v.Empleado
+                    cliente = cli,
+                    empleado = em
                 };
 
-                return View("Registrar", ct);
+                ViewBag.extintor = ext;
+                ViewBag.mantenimientos = Mantenimientos;
+                ViewBag.cliente_trabajador = ct;
+
+                return View("Registrar");
             }
 
         }
 
+        [HttpPost]
+        public IActionResult Registrar(ServicioMantenimientoVM mantVM)
+        {
+            Cliente cli = _appDBContext.Clientes.Find(mantVM.Cliente_ID);
+
+            ComprobanteServicio cs = new ComprobanteServicio
+            {
+                Cantidad = mantVM.Cantidad,
+                PrecioUnitario = mantVM.PrecioUnitario,
+                SubTotal = mantVM.SubTotal,
+                TipoServicio = "Mantenimiento",
+            };
+            _appDBContext.ComprobantesServicio.Add(cs);
+            _appDBContext.SaveChanges();
+            ReporteServicio rs = new ReporteServicio
+            {
+                Cliente = cli,
+                Cliente_ID = cli.IdCliente,
+                ComprobanteServicio = cs,
+                Comprobante_ID = cs.IdComprobante
+            };
+            _appDBContext.ReportesServicio.Add(rs);
+            _appDBContext.SaveChanges();
+
+            return View("Index");
+        }
+
+        [HttpGet]
+        public IActionResult RegistrarEstadoExtintor(int id)
+        {
+            Extintor ext = _appDBContext.Extintores.Find(id);
+            Venta vent = _appDBContext.Ventas.Find(ext.Venta_ID);
+            Empleado em = _appDBContext.empleados.Find(vent.Empleado_ID);
+            ViewBag.extintor = ext;
+            ViewBag.venta = vent;
+            ViewBag.empleado = em;
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult RegistrarEstadoExtintor(MantenimientoVM mantVM)
+        {
+            Empleado em = _appDBContext.empleados.Find(mantVM.Empleado_ID);
+            Extintor ex = _appDBContext.Extintores.Find(mantVM.Extintor_ID);
+            Mantenimiento mant = new Mantenimiento
+            {
+                AperturaCorrecta = mantVM.AperturaCorrecta,
+                BarometroCorrecto = mantVM.BarometroCorrecto,
+                BoquillaCorrecta = mantVM.BoquillaCorrecta,
+                EstadoIndicador = mantVM.EstadoIndicador,
+                EstadoPrecinto = mantVM.EstadoPrecinto,
+                ExteriorCorrecto = mantVM.ExteriorCorrecto,
+                FechaMantenimiento = DateTime.Now,
+                InstruccionesVisibles = mantVM.InstruccionesVisibles,
+                LugarAdecuado = mantVM.LugarAdecuado,
+                MangueraCorrecta = mantVM.MangueraCorrecta,
+                PesoCorrecto = mantVM.PesoCorrecto,
+                PresionCorrecta = mantVM.PresionCorrecta,
+                Señalización = mantVM.Señalización,
+                Usado = mantVM.Usado,
+                Visible = mantVM.Visible,
+                Empleado_ID = mantVM.Empleado_ID,
+                Extintor_ID = mantVM.Extintor_ID,
+                Empleado = em,
+                Extintor = ex,
+            };
+            _appDBContext.Mantenimientos.Add(mant);
+            _appDBContext.SaveChanges();
+
+            ViewBag.Extintor = ex;
+            Venta ven = _appDBContext.Ventas.Find(ex.Venta_ID);
+            ClienteTrabajadorVM ct = new ClienteTrabajadorVM
+            {
+                cliente = _appDBContext.Clientes.Find(ven.Cliente_ID),
+                empleado = em
+            };
+            ViewBag.mantenimientos = _appDBContext.Mantenimientos.Where(m => m.Extintor_ID == ex.IdExtintor).ToList();
+            ViewBag.cliente_trabajador = ct;
+            return View("Registrar");
+        }
     }
 }

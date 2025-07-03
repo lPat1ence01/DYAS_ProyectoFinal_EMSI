@@ -6,6 +6,7 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     var ExtintorId = ViewBag.ExtintorId;
+
 }
 
 <div class="container mt-5">
@@ -36,7 +37,7 @@
                                     <td>@mant.Extintor_ID</td>
                                     <td>@mant.Empleado.nomEmpleado</td>
                                     <td>@mant.FechaMantenimiento.ToString("yyyy-MM-dd")</td>
-                                    
+
                                 </tr>
                             }
                         </tbody>
@@ -45,7 +46,7 @@
             }
             else
             {
-                
+
                 <div class="alert alert-warning text-center" role="alert">
                     No hay extintores registrados en el inventario.
                 </div>
