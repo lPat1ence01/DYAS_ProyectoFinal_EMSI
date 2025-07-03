@@ -6,5 +6,6 @@ namespace EMSI_Corporation.ViewModels
     {
         public Cliente cliente { get; set; }
         public Empleado empleado { get; set; }
+        public string TipoServicio { get; set; }
     }
 }

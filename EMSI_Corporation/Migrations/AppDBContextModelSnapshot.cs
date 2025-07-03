@@ -275,11 +275,17 @@ namespace EMSI_Corporation.Migrations
                     b.Property<bool>("MangueraCorrecta")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("Mantenimiento")
+                        .HasColumnType("int");
+
                     b.Property<bool>("PesoCorrecto")
                         .HasColumnType("bit");
 
                     b.Property<bool>("PresionCorrecta")
                         .HasColumnType("bit");
+
+                    b.Property<int>("ReporteServicio_ID")
+                        .HasColumnType("int");
 
                     b.Property<bool>("Señalización")
                         .HasColumnType("bit");
@@ -295,6 +301,10 @@ namespace EMSI_Corporation.Migrations
                     b.HasIndex("Empleado_ID");
 
                     b.HasIndex("Extintor_ID");
+
+                    b.HasIndex("Mantenimiento");
+
+                    b.HasIndex("ReporteServicio_ID");
 
                     b.ToTable("Mantenimientos");
                 });
@@ -448,9 +458,6 @@ namespace EMSI_Corporation.Migrations
                         .IsRequired()
                         .HasColumnType("VARBINARY(MAX)");
 
-                    b.Property<int>("Mantenimiento_ID")
-                        .HasColumnType("int");
-
                     b.Property<string>("Observaciones")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -463,8 +470,6 @@ namespace EMSI_Corporation.Migrations
                     b.HasIndex("Cliente_ID");
 
                     b.HasIndex("Comprobante_ID");
-
-                    b.HasIndex("Mantenimiento_ID");
 
                     b.HasIndex("Recarga_ID");
 
@@ -669,9 +674,21 @@ namespace EMSI_Corporation.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("EMSI_Corporation.Models.ReporteServicio", null)
+                        .WithMany("Mantenimientos")
+                        .HasForeignKey("Mantenimiento");
+
+                    b.HasOne("EMSI_Corporation.Models.ReporteServicio", "ReporteServicio")
+                        .WithMany()
+                        .HasForeignKey("ReporteServicio_ID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Empleado");
 
                     b.Navigation("Extintor");
+
+                    b.Navigation("ReporteServicio");
                 });
 
             modelBuilder.Entity("EMSI_Corporation.Models.Recarga", b =>
@@ -725,12 +742,6 @@ namespace EMSI_Corporation.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EMSI_Corporation.Models.Mantenimiento", "Mantenimiento")
-                        .WithMany()
-                        .HasForeignKey("Mantenimiento_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("EMSI_Corporation.Models.Recarga", "Recarga")
                         .WithMany()
                         .HasForeignKey("Recarga_ID")
@@ -740,8 +751,6 @@ namespace EMSI_Corporation.Migrations
                     b.Navigation("Cliente");
 
                     b.Navigation("ComprobanteServicio");
-
-                    b.Navigation("Mantenimiento");
 
                     b.Navigation("Recarga");
                 });
@@ -846,6 +855,11 @@ namespace EMSI_Corporation.Migrations
             modelBuilder.Entity("EMSI_Corporation.Models.Proovedor", b =>
                 {
                     b.Navigation("Recepciones");
+                });
+
+            modelBuilder.Entity("EMSI_Corporation.Models.ReporteServicio", b =>
+                {
+                    b.Navigation("Mantenimientos");
                 });
 
             modelBuilder.Entity("EMSI_Corporation.Models.Rol", b =>

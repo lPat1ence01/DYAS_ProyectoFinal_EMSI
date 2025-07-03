@@ -229,6 +229,9 @@ namespace EMSI_Corporation.Data
                 tb.HasOne(m => m.Extintor)
                     .WithMany()
                     .HasForeignKey(m => m.Extintor_ID).OnDelete(DeleteBehavior.NoAction);
+                tb.HasOne(m => m.ReporteServicio)
+                    .WithMany()
+                    .HasForeignKey(m => m.ReporteServicio_ID).OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<Recarga>(tb =>
@@ -264,10 +267,6 @@ namespace EMSI_Corporation.Data
                 tb.HasOne(rs => rs.ComprobanteServicio)
         .WithMany()
         .HasForeignKey(rs => rs.Comprobante_ID);
-
-                tb.HasOne(rs => rs.Mantenimiento)
-        .WithMany()
-        .HasForeignKey(rs => rs.Mantenimiento_ID);
 
                 tb.HasOne(rs => rs.Recarga)
         .WithMany()

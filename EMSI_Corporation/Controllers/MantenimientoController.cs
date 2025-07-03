@@ -25,7 +25,7 @@ namespace EMSI_Corporation.Controllers
             ViewBag.ExtintorId = id;
             return View(Mantenimientos);
         }
-        public IActionResult Registrar(int id)
+        public IActionResult Registrar(int id)//si es sidebar no pasara id de extintor
         {
             Extintor? ext = _appDBContext.Extintores.Find(id);
             var Mantenimientos = _appDBContext.Mantenimientos.Where(m => m.Extintor_ID == id).ToList();

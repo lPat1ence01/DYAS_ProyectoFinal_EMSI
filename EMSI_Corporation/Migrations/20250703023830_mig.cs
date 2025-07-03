@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EMSI_Corporation.Migrations
 {
     /// <inheritdoc />
-    public partial class migK : Migration
+    public partial class mig : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -77,6 +77,24 @@ namespace EMSI_Corporation.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Proovedor",
+                columns: table => new
+                {
+                    IdProovedor = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RazonSocial = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    RUC = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    Direccion = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    NumCelular = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    Correo = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    estado = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Proovedor", x => x.IdProovedor);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Rol",
                 columns: table => new
                 {
@@ -98,7 +116,7 @@ namespace EMSI_Corporation.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     usuario = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    IdEmpleado = table.Column<int>(type: "int", nullable: false)
+                    IdEmpleado = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -193,6 +211,33 @@ namespace EMSI_Corporation.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Recepcion",
+                columns: table => new
+                {
+                    IdRecepcion = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UsuarioId = table.Column<int>(type: "int", nullable: true),
+                    ProovedorId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Recepcion", x => x.IdRecepcion);
+                    table.ForeignKey(
+                        name: "FK_Recepcion_Proovedor_ProovedorId",
+                        column: x => x.ProovedorId,
+                        principalTable: "Proovedor",
+                        principalColumn: "IdProovedor",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Recepcion_Usuario_UsuarioId",
+                        column: x => x.UsuarioId,
+                        principalTable: "Usuario",
+                        principalColumn: "IdUsuario",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "User_Rol",
                 columns: table => new
                 {
@@ -239,30 +284,6 @@ namespace EMSI_Corporation.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Extintores",
-                columns: table => new
-                {
-                    IdExtintor = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TipoAgente = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ClaseFuego = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    CapacidadKG = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    FechaVencimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Estado = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Venta_ID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Extintores", x => x.IdExtintor);
-                    table.ForeignKey(
-                        name: "FK_Extintores_Ventas_Venta_ID",
-                        column: x => x.Venta_ID,
-                        principalTable: "Ventas",
-                        principalColumn: "IdVenta",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "InformesTecnicos",
                 columns: table => new
                 {
@@ -284,43 +305,32 @@ namespace EMSI_Corporation.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Mantenimientos",
+                name: "Extintores",
                 columns: table => new
                 {
-                    IdMantenimiento = table.Column<int>(type: "int", nullable: false)
+                    IdExtintor = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FechaMantenimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LugarAdecuado = table.Column<bool>(type: "bit", nullable: false),
-                    Señalización = table.Column<bool>(type: "bit", nullable: false),
-                    Visible = table.Column<bool>(type: "bit", nullable: false),
-                    Usado = table.Column<bool>(type: "bit", nullable: false),
-                    EstadoPrecinto = table.Column<bool>(type: "bit", nullable: false),
-                    EstadoIndicador = table.Column<bool>(type: "bit", nullable: false),
-                    PresionCorrecta = table.Column<bool>(type: "bit", nullable: false),
-                    ExteriorCorrecto = table.Column<bool>(type: "bit", nullable: false),
-                    PesoCorrecto = table.Column<bool>(type: "bit", nullable: false),
-                    MangueraCorrecta = table.Column<bool>(type: "bit", nullable: false),
-                    BoquillaCorrecta = table.Column<bool>(type: "bit", nullable: false),
-                    InstruccionesVisibles = table.Column<bool>(type: "bit", nullable: false),
-                    AperturaCorrecta = table.Column<bool>(type: "bit", nullable: false),
-                    BarometroCorrecto = table.Column<bool>(type: "bit", nullable: false),
-                    Empleado_ID = table.Column<int>(type: "int", nullable: false),
-                    Extintor_ID = table.Column<int>(type: "int", nullable: false)
+                    TipoAgente = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ClaseFuego = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CapacidadKG = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
+                    FechaVencimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Estado = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Venta_ID = table.Column<int>(type: "int", nullable: true),
+                    RecepcionId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Mantenimientos", x => x.IdMantenimiento);
+                    table.PrimaryKey("PK_Extintores", x => x.IdExtintor);
                     table.ForeignKey(
-                        name: "FK_Mantenimientos_Empleado_Empleado_ID",
-                        column: x => x.Empleado_ID,
-                        principalTable: "Empleado",
-                        principalColumn: "IdEmpleado",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Extintores_Recepcion_RecepcionId",
+                        column: x => x.RecepcionId,
+                        principalTable: "Recepcion",
+                        principalColumn: "IdRecepcion");
                     table.ForeignKey(
-                        name: "FK_Mantenimientos_Extintores_Extintor_ID",
-                        column: x => x.Extintor_ID,
-                        principalTable: "Extintores",
-                        principalColumn: "IdExtintor");
+                        name: "FK_Extintores_Ventas_Venta_ID",
+                        column: x => x.Venta_ID,
+                        principalTable: "Ventas",
+                        principalColumn: "IdVenta");
                 });
 
             migrationBuilder.CreateTable(
@@ -363,7 +373,6 @@ namespace EMSI_Corporation.Migrations
                     ImgEvidencia = table.Column<byte[]>(type: "VARBINARY(MAX)", nullable: false),
                     Cliente_ID = table.Column<int>(type: "int", nullable: false),
                     Comprobante_ID = table.Column<int>(type: "int", nullable: false),
-                    Mantenimiento_ID = table.Column<int>(type: "int", nullable: false),
                     Recarga_ID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -382,22 +391,73 @@ namespace EMSI_Corporation.Migrations
                         principalColumn: "IdComprobante",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ReportesServicio_Mantenimientos_Mantenimiento_ID",
-                        column: x => x.Mantenimiento_ID,
-                        principalTable: "Mantenimientos",
-                        principalColumn: "IdMantenimiento",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_ReportesServicio_Recargas_Recarga_ID",
                         column: x => x.Recarga_ID,
                         principalTable: "Recargas",
                         principalColumn: "IdRecarga");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Mantenimientos",
+                columns: table => new
+                {
+                    IdMantenimiento = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FechaMantenimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LugarAdecuado = table.Column<bool>(type: "bit", nullable: false),
+                    Señalización = table.Column<bool>(type: "bit", nullable: false),
+                    Visible = table.Column<bool>(type: "bit", nullable: false),
+                    Usado = table.Column<bool>(type: "bit", nullable: false),
+                    EstadoPrecinto = table.Column<bool>(type: "bit", nullable: false),
+                    EstadoIndicador = table.Column<bool>(type: "bit", nullable: false),
+                    PresionCorrecta = table.Column<bool>(type: "bit", nullable: false),
+                    ExteriorCorrecto = table.Column<bool>(type: "bit", nullable: false),
+                    PesoCorrecto = table.Column<bool>(type: "bit", nullable: false),
+                    MangueraCorrecta = table.Column<bool>(type: "bit", nullable: false),
+                    BoquillaCorrecta = table.Column<bool>(type: "bit", nullable: false),
+                    InstruccionesVisibles = table.Column<bool>(type: "bit", nullable: false),
+                    AperturaCorrecta = table.Column<bool>(type: "bit", nullable: false),
+                    BarometroCorrecto = table.Column<bool>(type: "bit", nullable: false),
+                    Empleado_ID = table.Column<int>(type: "int", nullable: false),
+                    Extintor_ID = table.Column<int>(type: "int", nullable: false),
+                    ReporteServicio_ID = table.Column<int>(type: "int", nullable: false),
+                    Mantenimiento = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Mantenimientos", x => x.IdMantenimiento);
+                    table.ForeignKey(
+                        name: "FK_Mantenimientos_Empleado_Empleado_ID",
+                        column: x => x.Empleado_ID,
+                        principalTable: "Empleado",
+                        principalColumn: "IdEmpleado",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Mantenimientos_Extintores_Extintor_ID",
+                        column: x => x.Extintor_ID,
+                        principalTable: "Extintores",
+                        principalColumn: "IdExtintor");
+                    table.ForeignKey(
+                        name: "FK_Mantenimientos_ReportesServicio_Mantenimiento",
+                        column: x => x.Mantenimiento,
+                        principalTable: "ReportesServicio",
+                        principalColumn: "IdReporte");
+                    table.ForeignKey(
+                        name: "FK_Mantenimientos_ReportesServicio_ReporteServicio_ID",
+                        column: x => x.ReporteServicio_ID,
+                        principalTable: "ReportesServicio",
+                        principalColumn: "IdReporte");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Comprobantes_Venta_ID",
                 table: "Comprobantes",
                 column: "Venta_ID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Extintores_RecepcionId",
+                table: "Extintores",
+                column: "RecepcionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Extintores_Venta_ID",
@@ -420,6 +480,16 @@ namespace EMSI_Corporation.Migrations
                 column: "Extintor_ID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Mantenimientos_Mantenimiento",
+                table: "Mantenimientos",
+                column: "Mantenimiento");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Mantenimientos_ReporteServicio_ID",
+                table: "Mantenimientos",
+                column: "ReporteServicio_ID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Recargas_Empleado_ID",
                 table: "Recargas",
                 column: "Empleado_ID");
@@ -430,6 +500,16 @@ namespace EMSI_Corporation.Migrations
                 column: "Extintor_ID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Recepcion_ProovedorId",
+                table: "Recepcion",
+                column: "ProovedorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Recepcion_UsuarioId",
+                table: "Recepcion",
+                column: "UsuarioId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ReportesServicio_Cliente_ID",
                 table: "ReportesServicio",
                 column: "Cliente_ID");
@@ -438,11 +518,6 @@ namespace EMSI_Corporation.Migrations
                 name: "IX_ReportesServicio_Comprobante_ID",
                 table: "ReportesServicio",
                 column: "Comprobante_ID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReportesServicio_Mantenimiento_ID",
-                table: "ReportesServicio",
-                column: "Mantenimiento_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReportesServicio_Recarga_ID",
@@ -463,7 +538,8 @@ namespace EMSI_Corporation.Migrations
                 name: "IX_Usuario_IdEmpleado",
                 table: "Usuario",
                 column: "IdEmpleado",
-                unique: true);
+                unique: true,
+                filter: "[IdEmpleado] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ventas_Cliente_ID",
@@ -496,7 +572,7 @@ namespace EMSI_Corporation.Migrations
                 name: "InformesTecnicos");
 
             migrationBuilder.DropTable(
-                name: "ReportesServicio");
+                name: "Mantenimientos");
 
             migrationBuilder.DropTable(
                 name: "Rol_Menu");
@@ -508,13 +584,7 @@ namespace EMSI_Corporation.Migrations
                 name: "VisitasTecnicas");
 
             migrationBuilder.DropTable(
-                name: "ComprobantesServicio");
-
-            migrationBuilder.DropTable(
-                name: "Mantenimientos");
-
-            migrationBuilder.DropTable(
-                name: "Recargas");
+                name: "ReportesServicio");
 
             migrationBuilder.DropTable(
                 name: "Menu");
@@ -523,13 +593,25 @@ namespace EMSI_Corporation.Migrations
                 name: "Rol");
 
             migrationBuilder.DropTable(
-                name: "Usuario");
+                name: "ComprobantesServicio");
+
+            migrationBuilder.DropTable(
+                name: "Recargas");
 
             migrationBuilder.DropTable(
                 name: "Extintores");
 
             migrationBuilder.DropTable(
+                name: "Recepcion");
+
+            migrationBuilder.DropTable(
                 name: "Ventas");
+
+            migrationBuilder.DropTable(
+                name: "Proovedor");
+
+            migrationBuilder.DropTable(
+                name: "Usuario");
 
             migrationBuilder.DropTable(
                 name: "Clientes");

@@ -1,5 +1,4 @@
 ﻿using EMSI_Corporation.Data;
-using EMSI_Corporation.Migrations;
 using EMSI_Corporation.Models;
 using EMSI_Corporation.ViewModels;
 using Microsoft.AspNetCore.Mvc;
