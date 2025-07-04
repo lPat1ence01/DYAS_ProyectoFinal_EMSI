@@ -262,27 +262,108 @@ namespace EMSI_Corporation.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CrearEmpleado(IFormCollection form)
         {
-            // Captura datos del formulario
+            //remover las alertas para que no aparezcan al cargar la página
+            TempData.Remove("Error");
+            TempData.Remove("Success");
+
+            //convertir los datos a string para validacion
+            string nomEmpleado2 = form["nomEmpleado"];
+            string apeEmpleado2 = form["apeEmpleado"];
+            string dni2 = form["dni"];
+            string gmail2 = form["gmail"];
+            string numCelular2 = form["numCelular"];
+            //guardar los datos del usaurio para validacion
+            string usuario2 = form["usuario"];
+            string password2 = form["password"];
+
+
+            // Validaciones usando las variables string anteriormente seteadas
+            if (string.IsNullOrWhiteSpace(nomEmpleado2) || nomEmpleado2.Length > 100 || int.TryParse(nomEmpleado2, out _))
+            {
+                TempData["Error"] = "El Nombre es Inválido, introduce un apellido válido";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+
+            else if (string.IsNullOrWhiteSpace(apeEmpleado2) || apeEmpleado2.Length > 100 || int.TryParse(apeEmpleado2, out _))
+            {
+                TempData["Error"] = "El Apellido es Inválido, introduce un apellido válido";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+
+            else if (string.IsNullOrWhiteSpace(dni2) || dni2.Length != 8 || !dni2.All(char.IsDigit))
+            {
+                TempData["Error"] = "La longitud del DNI tiene que ser de 8 digitos";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+            // Verifica si el DNI del empleado ya lo tiene otro empleado.
+            else if (_appDBContext.empleados.Any(E => E.dni == dni2))
+            {
+                TempData["Error"] = "El DNI ingresado ya está registrado.";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+
+            else if (string.IsNullOrWhiteSpace(gmail2) || gmail2.Length > 100)
+            {
+                TempData["Error"] = "Correo Inválido";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+            // Verifica si el CORREO del empleado ya lo tiene otro empleado.
+            else if (_appDBContext.empleados.Any(E => E.gmail == gmail2))
+            {
+                TempData["Error"] = "El CORREO ingresado ya está registrado.";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+
+            else if (string.IsNullOrWhiteSpace(numCelular2) || numCelular2.Length > 10 || !numCelular2.All(char.IsDigit))
+            {
+                TempData["Error"] = "Número Inválido, demasiado largo.";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+            // Verifica si el CELULAR del empleado ya lo tiene otro empleado.
+            else if (_appDBContext.empleados.Any(E => E.numCelular == numCelular2))
+            {
+                TempData["Error"] = "El NÚMERO ingresado ya está registrado.";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+            else if (string.IsNullOrWhiteSpace(usuario2) || usuario2.Length > 100)
+            {
+                TempData["Error"] = "Usuario Inválido";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+
+            else if (string.IsNullOrWhiteSpace(password2) || password2.Length > 100)
+            {
+                TempData["Error"] = "Contraseña Inválida, muy grande";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+            // Verifica si el NOMBRE DE USUARIO del USUARIO ya lo tiene otro USUARIO.
+            else if (_appDBContext.usuarios.Any(U => U.usuario == usuario2))
+            {
+                TempData["Error"] = "El NOMBRE DE USUARIO ingresado ya está registrado.";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+
+            // Seteamos los datos anteriormente validados para el empleado
             var empleado = new Empleado
             {
-                nomEmpleado = form["nomEmpleado"],
-                apeEmpleado = form["apeEmpleado"],
-                dni = form["dni"],
-                gmail = form["gmail"],
-                numCelular = form["numCelular"]
+                nomEmpleado = nomEmpleado2,
+                apeEmpleado = apeEmpleado2,
+                dni = dni2,
+                gmail = gmail2,
+                numCelular = numCelular2
             };
-
+            //guardamos :p
             _appDBContext.empleados.Add(empleado);
             _appDBContext.SaveChanges();
 
-            // Crea el usuario asociado
+            // Seteamos los datos anteriormente validados para el usuario
             var usuario = new Usuario
             {
-                usuario = form["usuario"],
-                password = new PasswordHasher<Usuario>().HashPassword(null, form["password"]),
+                usuario = usuario2,
+                password = new PasswordHasher<Usuario>().HashPassword(null, password2),
                 IdEmpleado = empleado.IdEmpleado
             };
-
+            //guardamos :p
             _appDBContext.usuarios.Add(usuario);
             _appDBContext.SaveChanges();
 
@@ -318,9 +399,52 @@ namespace EMSI_Corporation.Controllers
         [HttpPost]
         public IActionResult EditarEmpleado(Empleado empleado)
         {
+
+            if (string.IsNullOrWhiteSpace(empleado.nomEmpleado) || empleado.nomEmpleado.Length > 100 || int.TryParse(empleado.nomEmpleado, out _))
+            {
+                TempData["Error"] = "El Nombre Ingresado es inválido.";
+                return RedirectToAction(nameof(Stakeholders_Empleado));
+            }
+            else if (string.IsNullOrWhiteSpace(empleado.apeEmpleado) || empleado.apeEmpleado.Length > 100 || int.TryParse(empleado.apeEmpleado, out _))
+            {
+                TempData["Error"] = "El Apellido Ingresado es inválido.";
+                return RedirectToAction(nameof(Stakeholders_Empleado));
+            }
+            else if (string.IsNullOrWhiteSpace(empleado.dni) || empleado.dni.Length != 8 || !empleado.dni.All(char.IsDigit))
+            {
+                TempData["Error"] = "El DNI Ingresado tiene que ser de 8 digitos.";
+                return RedirectToAction(nameof(Stakeholders_Empleado));
+            }
+            else if (_appDBContext.empleados.Any(E => E.dni == empleado.dni && E.IdEmpleado != empleado.IdEmpleado))
+            {
+                TempData["Error"] = "El DNI ingresado ya está registrado.";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+            else if (string.IsNullOrWhiteSpace(empleado.gmail) || empleado.gmail.Length > 100)
+            {
+                TempData["Error"] = "El Correo Ingresado es demasiado largo.";
+                return RedirectToAction(nameof(Stakeholders_Empleado));
+            }
+            else if (_appDBContext.empleados.Any(E => E.gmail == empleado.gmail && E.IdEmpleado != empleado.IdEmpleado))
+            {
+                TempData["Error"] = "El CORREO ingresado ya está registrado.";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
+            else if (string.IsNullOrWhiteSpace(empleado.numCelular) || empleado.numCelular.Length > 10 || !empleado.numCelular.All(char.IsDigit))
+            {
+                TempData["Error"] = "El Número Ingresado es demasiado largo.";
+                return RedirectToAction(nameof(Stakeholders_Empleado));
+            }
+            else if (_appDBContext.empleados.Any(E => E.numCelular == empleado.numCelular && E.IdEmpleado != empleado.IdEmpleado))
+            {
+                TempData["Error"] = "El NÚMERO ingresado ya está registrado.";
+                return RedirectToAction("Stakeholders_Empleado");
+            }
             _appDBContext.empleados.Update(empleado);
             _appDBContext.SaveChanges();
+            TempData["Success"] = "Empleado Editado correctamente.";
             return RedirectToAction(nameof(Stakeholders_Empleado));
+
         }
 
         //Eliminar
