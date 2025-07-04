@@ -8,6 +8,7 @@ namespace EMSI_Corporation.Controllers
     public class MantenimientoController : Controller
     {
         private readonly AppDBContext _appDBContext;
+        private List<Mantenimiento> mantenimientos_;
 
         public MantenimientoController(AppDBContext appDBContext)
         {
