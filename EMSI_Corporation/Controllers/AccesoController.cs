@@ -57,8 +57,9 @@ namespace EMSI_Corporation.Controllers
 
             var usuario = await _appDBContext.usuarios
                 .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Rol)
-                .FirstOrDefaultAsync(u => u.usuario.Trim().ToLower() == modelo.Username.Trim().ToLower());
+                .ThenInclude(ur => ur.Rol)
+                .FirstOrDefaultAsync(u =>
+                EF.Functions.Collate(u.usuario, "Latin1_General_CS_AS") == modelo.Username);
 
             if (usuario == null)
             {
@@ -536,7 +537,8 @@ namespace EMSI_Corporation.Controllers
             //guardar los datos del usaurio para validacion
             string usuario2 = form["usuario"];
             string password2 = form["password"];
-
+            // Normalizar el nombre de usuario
+            usuario2 = usuario2.Trim();
 
             // Validaciones usando las variables string anteriormente seteadas
             if (string.IsNullOrWhiteSpace(nomEmpleado2) || nomEmpleado2.Length > 100 || int.TryParse(nomEmpleado2, out _))

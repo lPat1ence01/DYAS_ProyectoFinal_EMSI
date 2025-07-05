@@ -6,6 +6,9 @@ namespace EMSI_Corporation.Models
     public class Usuario
     {
         [Key]
+        [Required]
+        [StringLength(100)]
+        [RegularExpression(@"^[a-z0-9@._]+$", ErrorMessage = "El nombre de usuario solo puede contener minúsculas, números y caracteres válidos.")]
         public int IdUsuario { get; set; }
         public string usuario { get; set; }
         public string password { get; set; }
