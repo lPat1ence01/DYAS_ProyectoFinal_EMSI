@@ -12,11 +12,11 @@
 <div class="container mt-5">
     <div class="card shadow-lg">
         <div class="card-header bg-gradient text-white" style="background: linear-gradient(90deg, #0d6efd, #6610f2);">
-            <h3 class="mb-0">Inventario de Extintores</h3>
+            <h3 class="mb-0">Mantenimientos</h3>
         </div>
         <div class="card-body">
-            <a asp-controller="Mantenimiento" asp-action="Registrar" asp-route-id=@ExtintorId>Registrar Mantenimiento</a>
-            <a asp-controller="Venta" asp-action="Registrar" asp-route-idExtintor=@ExtintorId>Registrar Venta</a>
+            <a asp-controller="Servicio" asp-action="SeleccionClienteTrabajador">Registrar Servicio</a>
+            <a asp-controller="Venta" asp-action="Registrar">Registrar Venta</a>
             @if (Model != null && Model.Any())
             {
                 <div class="table-responsive">
@@ -27,16 +27,27 @@
                                 <th>Id Extintor</th>
                                 <th>Nombre empleado</th>
                                 <th>Fecha mantenimiento</th>
+                                <th>Nombre cliente</th>
+                                <th>Precio unitario</th>
+                                <th>% de validez</th>
+                                <th>Id Reporte</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var mant in Model)
                             {
+                                var suma = (mant.AperturaCorrecta ? 1 : 0) + (mant.BarometroCorrecto ? 1 : 0) + (mant.Señalización ? 1 : 0) + (mant.InstruccionesVisibles ? 1 : 0) + (mant.BoquillaCorrecta ? 1 : 0) + (mant.EstadoIndicador ? 1 : 0) + (mant.EstadoPrecinto ? 1 : 0) + (mant.ExteriorCorrecto ? 1 : 0) + (mant.LugarAdecuado ? 1 : 0) + (mant.MangueraCorrecta ? 1 : 0) + (mant.PesoCorrecto ? 1 : 0) + (mant.PresionCorrecta ? 1 : 0);
+                                double per = (double)suma * 100 / 12.00;
+                                per = Math.Round(per, 2);
                                 <tr class="text-center">
                                     <td>@mant.IdMantenimiento</td>
                                     <td>@mant.Extintor_ID</td>
                                     <td>@mant.Empleado.nomEmpleado</td>
                                     <td>@mant.FechaMantenimiento.ToString("yyyy-MM-dd")</td>
+                                    <td>@mant.ReporteServicio.Cliente.NomCliente</td>
+                                    <td>@mant.ReporteServicio.ComprobanteServicio.PrecioUnitario</td>
+                                    <td>@(per)%</td>
+                                    <td>@mant.ReporteServicio_ID</td>
 
                                 </tr>
                             }
@@ -48,7 +59,7 @@
             {
 
                 <div class="alert alert-warning text-center" role="alert">
-                    No hay extintores registrados en el inventario.
+                    No hay mantenimientos registrados.
                 </div>
             }
         </div>

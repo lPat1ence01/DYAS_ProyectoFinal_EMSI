@@ -20,10 +20,10 @@ namespace EMSI_Corporation.Models
         public ComprobanteServicio ComprobanteServicio { get; set; }
 
         [ForeignKey("Mantenimiento")]
-        public ICollection<Mantenimiento> Mantenimientos { get; set; }
+        public ICollection<Mantenimiento>? Mantenimientos { get; set; }
 
         [ForeignKey("Recarga")]
-        public int Recarga_ID { get; set; }
-        public Recarga Recarga { get; set; }
+        public int? Recarga_ID { get; set; }
+        public Recarga? Recarga { get; set; }
     }
 }

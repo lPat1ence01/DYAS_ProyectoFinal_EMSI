@@ -30,9 +30,11 @@ namespace EMSI_Corporation.Controllers
         {
             //ViewBag.extintor = ext;//se supone que ya no
             ViewBag.mantenimientos = new List<Mantenimiento>();
-            ViewBag.cliente_trabajador = ctVM;
+            ctVM.cliente = _appDBContext.Clientes.Find(ctVM.clienteID);
+            ctVM.empleado = _appDBContext.empleados.Find(ctVM.empleadoID);
+            //ViewBag.cliente_trabajador = ctVM;
             if (ctVM.TipoServicio == "Mantenimiento") {
-                return RedirectToAction("Registrar","Mantenimiento");
+                return RedirectToAction("Registrar","Mantenimiento",ctVM);
             }
             else
             {

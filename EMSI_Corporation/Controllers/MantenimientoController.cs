@@ -2,61 +2,52 @@
 using EMSI_Corporation.Models;
 using EMSI_Corporation.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace EMSI_Corporation.Controllers
 {
     public class MantenimientoController : Controller
     {
         private readonly AppDBContext _appDBContext;
-        private List<Mantenimiento> mantenimientos_;
+        public static List<Mantenimiento> mantenimientos_ = new List<Mantenimiento>();
 
         public MantenimientoController(AppDBContext appDBContext)
         {
             _appDBContext = appDBContext;
         }
-        public IActionResult Index(int id)
+        public IActionResult Index()
         {
-            var Extintor = _appDBContext.Extintores.Find(id);
-            var Mantenimientos = _appDBContext.Mantenimientos.Where(m => m.Extintor_ID == id).ToList();
+            var Mantenimientos = _appDBContext.Mantenimientos.ToList();
             for (int i = 0; i < Mantenimientos.Count; i++)
             {
                 Mantenimientos[i].Empleado = _appDBContext.empleados.Find(Mantenimientos[i].Empleado_ID);
                 Mantenimientos[i].Extintor = _appDBContext.Extintores.Find(Mantenimientos[i].Extintor_ID);
+                Mantenimientos[i].ReporteServicio = _appDBContext.ReportesServicio.Find(Mantenimientos[i].ReporteServicio_ID);
+                Mantenimientos[i].ReporteServicio.Cliente = _appDBContext.Clientes.Find(Mantenimientos[i].ReporteServicio.Cliente_ID);
+                Mantenimientos[i].ReporteServicio.ComprobanteServicio = _appDBContext.ComprobantesServicio.Find(Mantenimientos[i].ReporteServicio.Comprobante_ID);
             }
-            ViewBag.ExtintorId = id;
             return View(Mantenimientos);
         }
-        public IActionResult Registrar(int id)//si es sidebar no pasara id de extintor
+        public IActionResult Registrar(ClienteTrabajadorVM ctVM)//si es sidebar no pasara id de extintor
         {
-            Extintor? ext = _appDBContext.Extintores.Find(id);
-            var Mantenimientos = _appDBContext.Mantenimientos.Where(m => m.Extintor_ID == id).ToList();
-            if (false)
+            /*
+            Empleado em = _appDBContext.empleados.Find(v.Empleado_ID);
+            Cliente cli = _appDBContext.Clientes.Find(v.Cliente_ID);
+
+            ClienteTrabajadorVM ct = new ClienteTrabajadorVM
             {
+                cliente = cli,
+                empleado = em
+            };*/
+            ViewBag.mantenimientos = mantenimientos_;
+            ctVM.empleado = _appDBContext.empleados.Find(ctVM.empleadoID);
+            ctVM.cliente = _appDBContext.Clientes.Find(ctVM.clienteID);
+            ViewBag.cliente_trabajador = ctVM;
+            ViewBag.extintores = _appDBContext.Extintores.ToList();
 
-
-                Index(id);
-                return View("Index");
-            }
-            else
-            {
-                Venta v = _appDBContext.Ventas.Find(ext.Venta_ID);
-                ext.Venta = v;
-
-                Empleado em = _appDBContext.empleados.Find(v.Empleado_ID);
-                Cliente cli = _appDBContext.Clientes.Find(v.Cliente_ID);
-
-                ClienteTrabajadorVM ct = new ClienteTrabajadorVM
-                {
-                    cliente = cli,
-                    empleado = em
-                };
-
-                ViewBag.extintor = ext;
-                ViewBag.mantenimientos = Mantenimientos;
-                ViewBag.cliente_trabajador = ct;
-
-                return View("Registrar");
-            }
+            return View("Registrar");
+            
 
         }
 
@@ -67,24 +58,39 @@ namespace EMSI_Corporation.Controllers
 
             ComprobanteServicio cs = new ComprobanteServicio
             {
-                Cantidad = mantVM.Cantidad,
+                Cantidad = mantenimientos_.Count,
                 PrecioUnitario = mantVM.PrecioUnitario,
-                SubTotal = mantVM.SubTotal,
+                SubTotal = mantenimientos_.Count * mantVM.PrecioUnitario,
                 TipoServicio = "Mantenimiento",
             };
             _appDBContext.ComprobantesServicio.Add(cs);
+            List<Mantenimiento> mants = new List<Mantenimiento>();
+            
             _appDBContext.SaveChanges();
             ReporteServicio rs = new ReporteServicio
             {
                 Cliente = cli,
                 Cliente_ID = cli.IdCliente,
                 ComprobanteServicio = cs,
-                Comprobante_ID = cs.IdComprobante
+                Comprobante_ID = cs.IdComprobante,
+                Mantenimientos = mants,
+                FirmaCliente = Array.Empty<byte>(),
+                ImgEvidencia = Array.Empty<byte>(),
+                Observaciones = mantVM.Observaciones
             };
-            _appDBContext.ReportesServicio.Add(rs);
+            var rep_ser = _appDBContext.ReportesServicio.Add(rs);
             _appDBContext.SaveChanges();
 
-            return View("Index");
+            foreach (var mant in mantenimientos_)
+            {
+                mant.ReporteServicio_ID = rep_ser.Entity.IdReporte;
+                var m = _appDBContext.Mantenimientos.Add(mant);
+                _appDBContext.SaveChanges();
+                mants.Add(m.Entity);
+            }
+            mantenimientos_.Clear();
+
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -96,7 +102,7 @@ namespace EMSI_Corporation.Controllers
             ViewBag.extintor = ext;
             ViewBag.venta = vent;
             ViewBag.empleado = em;
-            return View();
+            return View("RegistrarEstadoExtintor");
         }
 
         [HttpPost]
@@ -123,22 +129,114 @@ namespace EMSI_Corporation.Controllers
                 Visible = mantVM.Visible,
                 Empleado_ID = mantVM.Empleado_ID,
                 Extintor_ID = mantVM.Extintor_ID,
-                Empleado = em,
-                Extintor = ex,
             };
+            mantenimientos_.Add(mant);
+            /*
             _appDBContext.Mantenimientos.Add(mant);
-            _appDBContext.SaveChanges();
+            _appDBContext.SaveChanges();*/
 
-            ViewBag.Extintor = ex;
+            ViewBag.extintores = _appDBContext.Extintores.ToList();
             Venta ven = _appDBContext.Ventas.Find(ex.Venta_ID);
             ClienteTrabajadorVM ct = new ClienteTrabajadorVM
             {
                 cliente = _appDBContext.Clientes.Find(ven.Cliente_ID),
-                empleado = em
+                clienteID = ven.Cliente_ID,
+                empleado = em,
+                empleadoID = em.IdEmpleado
             };
-            ViewBag.mantenimientos = _appDBContext.Mantenimientos.Where(m => m.Extintor_ID == ex.IdExtintor).ToList();
+            ViewBag.mantenimientos = mantenimientos_;
             ViewBag.cliente_trabajador = ct;
             return View("Registrar");
         }
+
+        [HttpGet]
+        public FileResult DescargarExcel()
+        {
+            ExcelPackage.License.SetNonCommercialPersonal("EMSI");
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Datos");
+
+                //worksheet.Row(1).Style.Fill.SetBackground(System.Drawing.Color.AliceBlue);
+                //worksheet.Cells[1, 1, 1, 5].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin, System.Drawing.Color.Black, true);
+                //worksheet.Row(1).CustomHeight = true;
+                //worksheet.Row(1).Height = 50;
+                worksheet.Rows.Style.WrapText = true;
+                worksheet.Rows.Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                worksheet.Rows.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+
+                worksheet.Columns.Style.WrapText = true;
+                worksheet.Columns.Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                worksheet.Columns.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+
+
+                for (int i = 0; i < mantenimientos_.Count; i++)
+                {
+                    mantenimientos_[i].Empleado = _appDBContext.empleados.Find(mantenimientos_[i].Empleado_ID);
+                    mantenimientos_[i].Extintor = _appDBContext.Extintores.Find(mantenimientos_[i].Extintor_ID);
+                }
+
+                // Agrega datos
+                worksheet.Cells[1, 1].Value = "Id mantenimiento";
+                worksheet.Cells[1, 2].Value = "Nombre empleado";
+                worksheet.Cells[1, 3].Value = "Id Extintor";    
+                worksheet.Cells[1, 4].Value = "Fecha de mantenimiento";
+                worksheet.Cells[1, 5].Value = "Usado";
+                worksheet.Cells[1, 6].Value = "Visible";
+                worksheet.Cells[1, 7].Value = "Instrucciones visibles";
+                worksheet.Cells[1, 8].Value = "Apertura correcta";
+                worksheet.Cells[1, 9].Value = "Barómetro correcto";
+                worksheet.Cells[1, 10].Value = "Boquilla correcta";
+                worksheet.Cells[1, 11].Value = "Estado Indicador";
+                worksheet.Cells[1, 12].Value = "Estado precinto";
+                worksheet.Cells[1, 13].Value = "Exterior correcto";
+                worksheet.Cells[1, 14].Value = "Lugar adecuado";
+                worksheet.Cells[1, 15].Value = "Manguera correcta";
+                worksheet.Cells[1, 16].Value = "Peso correcto";
+                worksheet.Cells[1, 17].Value = "Presión correcta";
+                worksheet.Cells[1, 18].Value = "Señalización";
+
+                for (int i = 0; i < mantenimientos_.Count; i++)
+                {
+                    worksheet.Cells[i + 2, 1].Value = mantenimientos_[i].IdMantenimiento;
+                    worksheet.Cells[i + 2, 2].Value = mantenimientos_[i].Empleado.nomEmpleado;
+                    worksheet.Cells[i + 2, 3].Value = mantenimientos_[i].Extintor_ID;
+                    worksheet.Cells[i + 2, 4].Value = mantenimientos_[i].FechaMantenimiento;
+                    worksheet.Cells[i + 2, 5].Value = mantenimientos_[i].Usado?"Si":"No";
+                    worksheet.Cells[i + 2, 6].Value = mantenimientos_[i].Visible?"Si":"No";
+                    worksheet.Cells[i + 2, 7].Value = mantenimientos_[i].InstruccionesVisibles?"Si":"No";
+                    worksheet.Cells[i + 2, 8].Value = mantenimientos_[i].AperturaCorrecta?"Si":"No";
+                    worksheet.Cells[i + 2, 9].Value = mantenimientos_[i].BarometroCorrecto?"Si":"No";
+                    worksheet.Cells[i + 2, 10].Value = mantenimientos_[i].BoquillaCorrecta?"Si":"No";
+                    worksheet.Cells[i + 2, 11].Value = mantenimientos_[i].EstadoIndicador?"Correcto":"Incorrecto";
+                    worksheet.Cells[i + 2, 12].Value = mantenimientos_[i].EstadoPrecinto?"Correcto":"Incorrecto";
+                    worksheet.Cells[i + 2, 13].Value = mantenimientos_[i].ExteriorCorrecto?"Si":"No";
+                    worksheet.Cells[i + 2, 14].Value = mantenimientos_[i].LugarAdecuado?"Si":"No";
+                    worksheet.Cells[i + 2, 15].Value = mantenimientos_[i].MangueraCorrecta?"Si":"No";
+                    worksheet.Cells[i + 2, 16].Value = mantenimientos_[i].PesoCorrecto?"Si":"No";
+                    worksheet.Cells[i + 2, 17].Value = mantenimientos_[i].PresionCorrecta?"Si":"No";
+                    worksheet.Cells[i + 2, 18].Value = mantenimientos_[i].Señalización?"Correcta":"Incorrecta";
+                }
+
+                worksheet.Cells[1, 1, 1, 18].Style.Fill.SetBackground(OfficeOpenXml.Style.ExcelIndexedColor.Indexed30);
+                worksheet.Cells[2, 1, mantenimientos_.Count + 2, 18].Style.Fill.SetBackground(OfficeOpenXml.Style.ExcelIndexedColor.Indexed26);
+                worksheet.Cells[1, 1, mantenimientos_.Count + 2, 18].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[1, 1, mantenimientos_.Count + 2, 18].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[1, 1, mantenimientos_.Count + 2, 18].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[1, 1, mantenimientos_.Count + 2, 18].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+
+                var stream = new MemoryStream(package.GetAsByteArray());
+
+                return File(stream.ToArray(),
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            "reporte.xlsx");
+            }
+        }
     }
+
+
 }

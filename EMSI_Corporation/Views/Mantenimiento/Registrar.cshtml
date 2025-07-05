@@ -1,22 +1,36 @@
 ﻿@model EMSI_Corporation.ViewModels.ServicioMantenimientoVM;
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var extintor = ViewBag.extintor as EMSI_Corporation.Models.Extintor;//Se supone que quite esto para acceder desde el sidebar
+    var extintores = ViewBag.extintores as List<EMSI_Corporation.Models.Extintor>;//Se supone que quite esto para acceder desde el sidebar
     var mantenimientos = ViewBag.mantenimientos as List<EMSI_Corporation.Models.Mantenimiento>;
     var cliente_trabajador = ViewBag.cliente_trabajador as EMSI_Corporation.ViewModels.ClienteTrabajadorVM;
+    Extintor? extintor = null;
 
+    var total = 0.0;
 }
 
 <main>
-    <form method="get" action="/Acceso/DescargarExcel">
-        <button type="submit" class="btn btn-primary">Descargar Excel</button>
-    </form>
+    
+    
     <form asp-controller="Mantenimiento" asp-action="Registrar" method="post" class="mantenimiento">
         <div class="seccion sec-mant-servicio">
             <h1 class="titulo">Servicio</h1>
             <div class="form-line">
                 <span>Cliente:</span>
                 <span>@cliente_trabajador.cliente.NomCliente</span>
+                <input hidden asp-for="Cliente_ID" value=@cliente_trabajador.clienteID />
+            </div>
+            <div class="form-line">
+                <span>Extintor (solo se muestran aquellos que han sido vendidos):</span>
+                <select class="field" asp-for="Extintor_ID" id="extintorSelect">
+                    @foreach(var ext in extintores)
+                    {
+                        @if(ext.Venta_ID > 0 || ext.Venta_ID != null)
+                        {
+                            <option value=@ext.IdExtintor>@ext.IdExtintor</option>
+                        }
+                    }
+                </select>
             </div>
             <div class="form-line">
                 <span>Fecha:</span>
@@ -24,20 +38,16 @@
             </div>
             <div class="form-line">
                 <span>Precio unitario:</span>
-                <input asp-for="PrecioUnitario" type="text" class="field">
-            </div>
-            <div class="form-line">
-                <span>Hora inicio:</span>
-                <input type="time" class="field">
-            </div>
-            <div class="form-line">
-                <span>Hora fin:</span>
-                <input type="time" class="field">
+                <input asp-for="PrecioUnitario" type="text" class="field" id="precioUnitario">
             </div>
             <h3 class="titulo">Productos</h3>
-            <a type="button" class="btn btn-1" asp-controller="Mantenimiento" asp-action="RegistrarEstadoExtintor" asp-route-id=@extintor.IdExtintor>
-                Agregar producto
-            </a>
+            @if(extintores.Count > 0)
+            {
+                <a class="btn btn-1" id="btnAgregarProducto">
+                    Agregar producto
+                </a>
+            }
+            
 
 
             <table class="table">
@@ -61,7 +71,7 @@
                         per = Math.Round(per, 2);
                         <tr>
                             <th scope="row">@mant.IdMantenimiento</th>
-                            <td>@mant.Empleado.nomEmpleado</td>
+                            <td>@cliente_trabajador.empleado.nomEmpleado</td>
                             <td>@mant.Extintor_ID</td>
                             <td>@mant.Usado</td>
                             <td>@mant.Visible</td>
@@ -71,12 +81,14 @@
                     }
                 </tbody>
             </table>
+            <p id="subtotalLabel">Total:</p>
+            <a asp-controller="Mantenimiento" asp-action="DescargarExcel" class="btn btn-primary">Descargar Excel</a>
         </div>
 
         <div class="seccion sec-mant-observaciones">
             <h1 class="titulo">OBSERVACIONES</h1>
             <div class="form-line">
-                <textarea name="" id="" cols="30" rows="10" class="field w-100"></textarea>
+                <textarea id="" cols="30" rows="10" class="field w-100" asp-for="Observaciones"></textarea>
             </div>
 
             <h1 class="titulo">FIRMA</h1>
@@ -89,13 +101,11 @@
 
             <button type="submit" class="btn-1">Añadir</button>
         </div>
-        <div class="seccion sec-mant-excel">
-            <h1 class="titulo">EXCEL</h1>
-        </div>
     </form>
 </main>
 
 <script>
+    
     const canvas = document.getElementById("myCanvas");
     const canvas_clear_btn = document.getElementById("canvas-clear");
     const canvas_save_btn = document.getElementById("canvas-save");
@@ -149,14 +159,8 @@
     canvas_clear_btn.addEventListener("click", fillBG);
     canvas_save_btn.addEventListener("click", saveIMG);
 
-    const addProdBTN = document.querySelector("#add-prod-btn");
-
-    const addProd = () => {
-
-    }
-
-    addProdBTN.addEventListener("click", addProd)
-
+   
+    /*
     const excelBTN = document.querySelector("#boton-excel");
     excelBTN.addEventListener("click", () => {
         fetch("@Url.Action("DownExcel")", {
@@ -166,7 +170,7 @@
             console.log(data);
             saveExcel(data)
         })
-    })
+    })*/
 
     const saveExcel = (response) => {
         var headers = response.headers;
@@ -176,6 +180,30 @@
 
         window.open(window.URL.createObjectURL(blob));
     }
+
+    const addprod = () => {
+        console.log("clck")
+        const selectedId = document.getElementById("extintorSelect").value;
+        if (selectedId) {
+            const url = `/Mantenimiento/RegistrarEstadoExtintor/${selectedId}`;
+            window.location.href = url;
+        }else{
+            alert("Debe seleccionar un extintor")
+        }
+    }
+    
+    const btn_ag_prod = document.getElementById("btnAgregarProducto");
+    btn_ag_prod.addEventListener("click", addprod);
+
+    const changeUnit = () => {
+        const precioUnitario = document.getElementById("precioUnitario").value;
+        const subtotalLabel = document.getElementById("subtotalLabel");
+        
+        subtotalLabel.innerText = "Total: " + precioUnitario;
+    }
+
+    const inputPrecioUnitario = document.getElementById("precioUnitario");
+    inputPrecioUnitario.addEventListener("change", changeUnit);
 
     /*
         canvas.width = 200;

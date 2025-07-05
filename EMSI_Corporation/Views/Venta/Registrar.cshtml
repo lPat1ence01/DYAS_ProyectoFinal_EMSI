@@ -6,7 +6,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     var clientes = ViewBag.clientes as List<EMSI_Corporation.Models.Cliente>;
     var empleados = ViewBag.empleados as List<EMSI_Corporation.Models.Empleado>;
-    var Extintor_ID = ViewBag.Extintor_ID;
+    var extintores = ViewBag.extintores as List<EMSI_Corporation.Models.Extintor>;
 }
 
 <!--public DateTime FechaVenta { get; set; }
@@ -19,7 +19,6 @@
     public int Empleado_ID { get; set; }
     public Empleado Empleado { get; set; }-->
 <form class="seccion" method="post" asp-controller="Venta" asp-action="Registrar">
-    <input type="text" value=@Extintor_ID asp-for="Extintor_ID" hidden />
     <div class="form-line">
         <span>Fecha de venta:</span>
         <input class="field" placeholder="Fecha de venta" type="date" asp-for="FechaVenta" />
@@ -33,7 +32,7 @@
         <input class="field" placeholder="Pago total" type="text" asp-for="Total" />
     </div>
     <div class="form-line">
-        <span>Clientes:</span>
+        <span>Cliente:</span>
         <select class="field" asp-for="Cliente_ID">
             @foreach (Cliente cliente in clientes)
             {
@@ -42,11 +41,20 @@
         </select>
     </div>
     <div class="form-line">
-        <span>Empleados:</span>
+        <span>Empleado:</span>
         <select class="field" asp-for="Empleado_ID">
             @foreach (Empleado empleado in empleados)
             {
                 <option value=@empleado.IdEmpleado>@empleado.nomEmpleado</option>
+            }
+        </select>
+    </div>
+    <div class="form-line">
+        <span>Extintor:</span>
+        <select class="field" asp-for="Extintor_ID">
+            @foreach (Extintor extintor in extintores)
+            {
+                <option value=@extintor.IdExtintor>@extintor.IdExtintor</option>
             }
         </select>
     </div>

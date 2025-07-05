@@ -16,12 +16,15 @@ namespace EMSI_Corporation.Controllers
         public IActionResult Index()
         {
             var ventas = _appDBContext.Ventas.ToList();
+            var extintores = _appDBContext.Extintores.ToList();
+
             for (int i = 0; i < ventas.Count; i++)
             {
                 ventas[i].Cliente = _appDBContext.Clientes.Find(ventas[i].Cliente_ID);
                 ventas[i].Empleado = _appDBContext.empleados.Find(ventas[i].Empleado_ID);
             }
 
+            ViewBag.extintores = extintores;
             return View(ventas);
         }
 
@@ -34,11 +37,11 @@ namespace EMSI_Corporation.Controllers
         }
 
         [HttpGet]
-        public IActionResult Registrar(int idExtintor)
+        public IActionResult Registrar()
         {
             ViewBag.clientes = _appDBContext.Clientes.ToList();
             ViewBag.empleados = _appDBContext.empleados.ToList();
-            ViewBag.Extintor_ID = idExtintor;
+            ViewBag.extintores = _appDBContext.Extintores.ToList();
             return View();
         }
 
@@ -91,6 +94,7 @@ namespace EMSI_Corporation.Controllers
             {
                 ViewBag.clientes = _appDBContext.Clientes.ToList();
                 ViewBag.empleados = _appDBContext.empleados.ToList();
+                ViewBag.extintores = _appDBContext.Extintores.ToList();
                 ViewData["error"] = "Datos incorrectos";
                 return View();
             }

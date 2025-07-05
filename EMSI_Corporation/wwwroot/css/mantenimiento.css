@@ -40,12 +40,12 @@ body {
 .mantenimiento {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
     gap: 2em;
 }
 
 .sec-mant-servicio {
-    grid-area: 1 / 1 / span 2 / span 1;
+    grid-area: 1 / 1 / span 1 / span 1;
 }
 
 .sec-mant-datos {
@@ -53,7 +53,7 @@ body {
 }
 
 .sec-mant-observaciones {
-    grid-area: 1 / 2 / span 3 / span 1;
+    grid-area: 1 / 2 / span 1 / span 1;
 }
 
 .sec-mant-excel {
@@ -62,4 +62,19 @@ body {
 
 canvas {
     cursor: crosshair;
+}
+
+@media screen and (max-width:1000px){
+    .mantenimiento {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+    }
+
+    .sec-mant-servicio {
+        grid-area: 1 / 1 / span 1 / span 1;
+    }
+
+    .sec-mant-observaciones {
+        grid-area: 2 / 1 / span 1 / span 1;
+    }
 }

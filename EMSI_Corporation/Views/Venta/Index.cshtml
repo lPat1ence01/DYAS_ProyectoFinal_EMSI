@@ -2,6 +2,7 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var extintores = ViewBag.extintores as List<EMSI_Corporation.Models.Extintor>;
 }
 
 <main>
@@ -32,11 +33,13 @@
                 <th>Total</th>
                 <th>Cliente</th>
                 <th>Empleado</th>
+                <th>Extintor</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var v in Model)
             {
+                var ext = extintores.Find(e => e.Venta_ID == v.IdVenta);
                 <tr>
                     <td>@v.IdVenta</td>
                     <td>@v.FechaVenta</td>
@@ -44,6 +47,10 @@
                     <td>@v.Total</td>
                     <td>@v.Cliente.NomCliente</td>
                     <td>@v.Empleado.IdEmpleado</td>
+                    @if (ext != null)
+                    {
+                        <td>@ext.IdExtintor</td>
+                    }
                 </tr>
 
 
