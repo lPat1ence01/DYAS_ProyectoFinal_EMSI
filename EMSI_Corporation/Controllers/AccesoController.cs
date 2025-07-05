@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Text.RegularExpressions;
 
 
 namespace EMSI_Corporation.Controllers
@@ -52,6 +53,12 @@ namespace EMSI_Corporation.Controllers
         {
             if (!ModelState.IsValid)
             {
+                return View(modelo);
+            }
+            // Validación de caracteres del lado del servidor
+            if (!Regex.IsMatch(modelo.Username, @"^[a-zA-Z0-9@._]+$"))
+            {
+                ModelState.AddModelError(nameof(modelo.Username), "El nombre de usuario contiene caracteres inválidos.");
                 return View(modelo);
             }
 
