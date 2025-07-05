@@ -5,11 +5,15 @@
 }
 
 <main>
+    <!-- Contenedor para alertas (inicialmente vacío) -->
+    <div id="alert-container" class="" style="z-index: 9999">
+    </div>
     <div class="seccion d-flex flex-row w-100 gap-4 mb-4">
         <div class="stakeholder w-50 seccion d-flex flex-row gap-4 align-items-center justify-content-center selected">
             <h1 class="titulo">Clientes</h1>
         </div>
-        <a class="stakeholder w-50 seccion d-flex flex-row gap-4 align-items-center justify-content-center" asp-controller="Acceso" asp-action="Stakeholders_Proovedor">
+        <a class="stakeholder w-50 seccion d-flex flex-row gap-4 align-items-center justify-content-center"
+            asp-controller="Acceso" asp-action="Stakeholders_Proovedor">
             <h1 class="titulo">Proveedores</h1>
         </a>
     </div>
@@ -41,8 +45,10 @@
                     <td>@c.NumCelular</td>
                     <td>@c.Correo</td>
                     <td>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditar-@c.IdCliente">Editar</button>
-                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar-@c.IdCliente">Eliminar</button>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                            data-bs-target="#modalEditar-@c.IdCliente">Editar</button>
+                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#modalEliminar-@c.IdCliente">Eliminar</button>
                     </td>
                 </tr>
 
@@ -64,8 +70,10 @@
                                     <div class="col-md-6">
                                         <label>Tipo</label>
                                         <select name="TipoCliente" class="form-select" required>
-                                            <option value="Persona Natural" selected ="@(c.TipoCliente == "Persona Natural")">Persona Natural</option>
-                                            <option value="Empresa" selected="@(c.TipoCliente == "Empresa")">Empresa</option>
+                                            <option value="Persona Natural"
+                                                selected="@(c.TipoCliente == "Persona Natural")">Persona Natural</option>
+                                            <option value="Empresa" selected="@(c.TipoCliente == "Empresa")">Empresa
+                                            </option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
@@ -73,7 +81,9 @@
                                         <select name="TipoDocumento" class="form-select" required>
                                             <option value="DNI" selected="@(c.TipoDocumento == "DNI")">DNI</option>
                                             <option value="RUC" selected="@(c.TipoDocumento == "RUC")">RUC</option>
-                                            <option value="CARNET DE EXTRANJERIA" selected="@(c.TipoDocumento == "CARNET DE EXTRANJERIA")">CARNET DE EXTRANJERIA</option>
+                                            <option value="CARNET DE EXTRANJERIA"
+                                                selected="@(c.TipoDocumento == "CARNET DE EXTRANJERIA")">CARNET DE
+                                                EXTRANJERIA</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
@@ -82,7 +92,8 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label>Teléfono</label>
-                                        <input name="NumCelular" value="@c.NumCelular" class="form-control" maxlength="9" pattern="\d{9}" required />
+                                        <input name="NumCelular" value="@c.NumCelular" class="form-control" maxlength="9"
+                                            pattern="\d{9}" required />
                                     </div>
                                     <div class="col-md-6">
                                         <label>Correo</label>
@@ -91,7 +102,8 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn-success">Guardar</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
                                 </div>
                             </form>
                         </div>
@@ -113,7 +125,8 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
                                 </div>
                             </form>
                         </div>
@@ -123,7 +136,45 @@
         </tbody>
     </table>
 </main>
+@section Scripts {
+    <script>
+        // Mostrar alertas solo si existen en TempData
+        $(function () {
+            @if (TempData["Error"] != null)
+                {
+                    <text>
+                        showAlert('@TempData["Error"]', 'danger');
+                    </text>
+                // Limpiar TempData después de mostrarlo
+                    TempData.Remove("Error");
+                }
 
+                @if (TempData["Success"] != null)
+                {
+                    <text>
+                        showAlert('@TempData["Success"]', 'success');
+                    </text>
+                // Limpiar TempData después de mostrarlo
+                    TempData.Remove("Success");
+                }
+
+                function showAlert(message, type) {
+                    const alert = `
+                            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                                ${message}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>`;
+
+                    $('#alert-container').append(alert);
+
+                    // Auto-ocultar después de 5 segundos
+                    setTimeout(() => {
+                        $('.alert').alert('close');
+                    }, 5000);
+                }
+        });
+    </script>
+}
 <!-- Modal Crear -->
 <div class="modal fade" id="modalCrear" tabindex="-1">
     <div class="modal-dialog modal-lg">
