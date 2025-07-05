@@ -129,9 +129,87 @@ namespace EMSI_Corporation.Controllers
         [HttpPost]
         public IActionResult CrearCliente(Cliente cliente)
         {
+            //remover las alertas para que no aparezcan al cargar la página
+            TempData.Remove("Error");
+            TempData.Remove("Success");
+
+            if (string.IsNullOrWhiteSpace(cliente.NomCliente) || cliente.NomCliente.Length > 100 || int.TryParse(cliente.NomCliente, out _))
+            {
+                TempData["Error"] = "El Nombre es Inválido, introduce un Nombre válido";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (string.IsNullOrWhiteSpace(cliente.TipoCliente) || cliente.TipoCliente.Length > 16)
+            {
+                TempData["Error"] = "El TIPO DE CLIENTE es Inválido, selecciona un TIPO DE CLIENTE válido";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (string.IsNullOrWhiteSpace(cliente.TipoDocumento) || cliente.TipoDocumento.Length > 22)
+            {
+                TempData["Error"] = "El TIPO DE DOCUMENTO es Inválido, selecciona un TIPO DE DOCUMENTO válido";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (string.IsNullOrWhiteSpace(cliente.NumDocumento) || cliente.NumDocumento.Length > 13)
+            {
+                TempData["Error"] = "El DOCUMENTO es invalido";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (cliente.TipoDocumento == "DNI" && cliente.NumDocumento.Length != 8)
+            {
+                TempData["Error"] = "El DNI debe tener 8 digitos";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (cliente.TipoDocumento == "RUC" && cliente.NumDocumento.Length != 11)
+            {
+                TempData["Error"] = "El RUC debe tener 12 digitos";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (cliente.TipoDocumento == "CARNET DE EXTRANJERIA" && cliente.NumDocumento.Length != 12)
+            {
+                TempData["Error"] = "El CARNET DE EXTRANJERIA debe tener 12 digitos";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (_appDBContext.Clientes.Any(C => C.NumDocumento == cliente.NumDocumento))
+            {
+                TempData["Error"] = "El NÚMERO DE DOCUMENTO ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (string.IsNullOrWhiteSpace(cliente.NumCelular) || cliente.NumCelular.Length > 20 || !cliente.NumCelular.All(char.IsDigit))
+            {
+                TempData["Error"] = "El CELULAR es demasiado Largo";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (_appDBContext.Clientes.Any(C => C.NumCelular == cliente.NumCelular))
+            {
+                TempData["Error"] = "El NÚMERO DE CELULAR ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (string.IsNullOrWhiteSpace(cliente.Correo) || cliente.Correo.Length > 100)
+            {
+                TempData["Error"] = "El CORREO es demasiado largo";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (_appDBContext.Clientes.Any(C => C.Correo == cliente.Correo))
+            {
+                TempData["Error"] = "El CORREO ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
             _appDBContext.Clientes.Add(cliente);
             _appDBContext.SaveChanges();
+            TempData["Success"] = "Cliente registrado correctamente.";
             return RedirectToAction(nameof(Stakeholders_Cliente));
+
         }
 
         // Editar
@@ -149,9 +227,80 @@ namespace EMSI_Corporation.Controllers
         [HttpPost]
         public IActionResult EditarCliente(Cliente cliente)
         {
+
+            if (string.IsNullOrWhiteSpace(cliente.NomCliente) || cliente.NomCliente.Length > 100 || int.TryParse(cliente.NomCliente, out _))
+            {
+                TempData["Error"] = "El Nombre es Inválido, introduce un Nombre válido";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (string.IsNullOrWhiteSpace(cliente.TipoCliente) || cliente.TipoCliente.Length > 16)
+            {
+                TempData["Error"] = "El TIPO DE CLIENTE es Inválido, selecciona un TIPO DE CLIENTE válido";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (string.IsNullOrWhiteSpace(cliente.TipoDocumento) || cliente.TipoDocumento.Length > 22)
+            {
+                TempData["Error"] = "El TIPO DE DOCUMENTO es Inválido, selecciona un TIPO DE DOCUMENTO válido";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (string.IsNullOrWhiteSpace(cliente.NumDocumento) || cliente.NumDocumento.Length > 13)
+            {
+                TempData["Error"] = "El DOCUMENTO es invalido";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+            else if (_appDBContext.Clientes.Any(C => C.NumDocumento == cliente.NumDocumento && C.IdCliente != cliente.IdCliente))
+            {
+                TempData["Error"] = "El NÚMERO DE DOCUMENTO ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+            else if (cliente.TipoDocumento == "DNI" && cliente.NumDocumento.Length != 8)
+            {
+                TempData["Error"] = "El DNI debe tener 8 digitos";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (cliente.TipoDocumento == "RUC" && cliente.NumDocumento.Length != 11)
+            {
+                TempData["Error"] = "El RUC debe tener 12 digitos";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (cliente.TipoDocumento == "CARNET DE EXTRANJERIA" && cliente.NumDocumento.Length != 12)
+            {
+                TempData["Error"] = "El CARNET DE EXTRANJERIA debe tener 12 digitos";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (string.IsNullOrWhiteSpace(cliente.NumCelular) || cliente.NumCelular.Length > 20 || !cliente.NumCelular.All(char.IsDigit))
+            {
+                TempData["Error"] = "El CELULAR es demasiado Largo";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+            else if (_appDBContext.Clientes.Any(C => C.NumCelular == cliente.NumCelular && C.IdCliente != cliente.IdCliente))
+            {
+                TempData["Error"] = "El NÚMERO DE CELULAR ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
+            else if (string.IsNullOrWhiteSpace(cliente.Correo) || cliente.Correo.Length > 100)
+            {
+                TempData["Error"] = "El CORREO es demasiado largo";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+            else if (_appDBContext.Clientes.Any(C => C.Correo == cliente.Correo && C.IdCliente != cliente.IdCliente))
+            {
+                TempData["Error"] = "El CORREO ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Cliente));
+            }
+
             _appDBContext.Clientes.Update(cliente);
             _appDBContext.SaveChanges();
+            TempData["Success"] = "Cliente editado correctamente.";
             return RedirectToAction(nameof(Stakeholders_Cliente));
+
         }
 
         // Eliminar
@@ -195,8 +344,61 @@ namespace EMSI_Corporation.Controllers
         [HttpPost]
         public IActionResult CrearProovedor(Proovedor proveedor)
         {
+            // Remover las alertas previas
+            TempData.Remove("Error");
+            TempData.Remove("Success");
+
+            if (string.IsNullOrWhiteSpace(proveedor.RazonSocial) || proveedor.RazonSocial.Length > 100 || int.TryParse(proveedor.RazonSocial, out _))
+            {
+                TempData["Error"] = "La Razón Social es Inválida, introduce una Razón Social válida";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (string.IsNullOrWhiteSpace(proveedor.RUC) || proveedor.RUC.Length != 11 || !proveedor.RUC.All(char.IsDigit))
+            {
+                TempData["Error"] = "El RUC es Inválido, debe tener 11 dígitos";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (_appDBContext.Provedor.Any(p => p.RUC == proveedor.RUC))
+            {
+                TempData["Error"] = "El RUC ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (!string.IsNullOrWhiteSpace(proveedor.Direccion) && proveedor.Direccion.Length > 150)
+            {
+                TempData["Error"] = "La DIRECCIÓN es demasiado larga";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (!string.IsNullOrWhiteSpace(proveedor.NumCelular) && (proveedor.NumCelular.Length > 15 || !proveedor.NumCelular.All(char.IsDigit)))
+            {
+                TempData["Error"] = "El CELULAR es inválido";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (!string.IsNullOrWhiteSpace(proveedor.NumCelular) && _appDBContext.Provedor.Any(p => p.NumCelular == proveedor.NumCelular))
+            {
+                TempData["Error"] = "El NÚMERO DE CELULAR ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (!string.IsNullOrWhiteSpace(proveedor.Correo) && proveedor.Correo.Length > 100)
+            {
+                TempData["Error"] = "El CORREO es demasiado largo";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (!string.IsNullOrWhiteSpace(proveedor.Correo) && _appDBContext.Provedor.Any(p => p.Correo == proveedor.Correo))
+            {
+                TempData["Error"] = "El CORREO ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
             _appDBContext.Provedor.Add(proveedor);
             _appDBContext.SaveChanges();
+            TempData["Success"] = "Proveedor registrado correctamente.";
             return RedirectToAction(nameof(Stakeholders_Proovedor));
         }
 
@@ -215,8 +417,67 @@ namespace EMSI_Corporation.Controllers
         [HttpPost]
         public IActionResult EditarProovedor(Proovedor proveedor)
         {
+            // Remover alertas previas
+            TempData.Remove("Error");
+            TempData.Remove("Success");
+
+            if (string.IsNullOrWhiteSpace(proveedor.RazonSocial) || proveedor.RazonSocial.Length > 100 || int.TryParse(proveedor.RazonSocial, out _))
+            {
+                TempData["Error"] = "La Razón Social es Inválida, introduce una Razón Social válida";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (string.IsNullOrWhiteSpace(proveedor.RUC) ||
+                     proveedor.RUC.Length != 11 ||
+                     !proveedor.RUC.All(char.IsDigit))
+            {
+                TempData["Error"] = "El RUC es Inválido, debe tener 11 dígitos";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (_appDBContext.Provedor.Any(p => p.RUC == proveedor.RUC && p.IdProovedor != proveedor.IdProovedor))
+            {
+                TempData["Error"] = "El RUC ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (!string.IsNullOrWhiteSpace(proveedor.Direccion) && proveedor.Direccion.Length > 150)
+            {
+                TempData["Error"] = "La DIRECCIÓN es demasiado larga";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (!string.IsNullOrWhiteSpace(proveedor.NumCelular) && (proveedor.NumCelular.Length > 15 || !proveedor.NumCelular.All(char.IsDigit)))
+            {
+                TempData["Error"] = "El CELULAR es inválido";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (!string.IsNullOrWhiteSpace(proveedor.NumCelular) && _appDBContext.Provedor.Any(p => p.NumCelular == proveedor.NumCelular && p.IdProovedor != proveedor.IdProovedor))
+            {
+                TempData["Error"] = "El NÚMERO DE CELULAR ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (!string.IsNullOrWhiteSpace(proveedor.Correo) &&
+                     proveedor.Correo.Length > 100)
+            {
+                TempData["Error"] = "El CORREO es demasiado largo";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
+            else if (!string.IsNullOrWhiteSpace(proveedor.Correo) &&
+                     _appDBContext.Provedor.Any(p =>
+                     p.Correo == proveedor.Correo &&
+                     p.IdProovedor != proveedor.IdProovedor))
+            {
+                TempData["Error"] = "El CORREO ingresado ya está registrado.";
+                return RedirectToAction(nameof(Stakeholders_Proovedor));
+            }
+
             _appDBContext.Provedor.Update(proveedor);
             _appDBContext.SaveChanges();
+            TempData["Success"] = "Proveedor actualizado correctamente";
             return RedirectToAction(nameof(Stakeholders_Proovedor));
         }
 
