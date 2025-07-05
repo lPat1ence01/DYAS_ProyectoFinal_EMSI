@@ -5,8 +5,12 @@
 }
 
 <main>
+    <!-- Contenedor para alertas (inicialmente vacío) -->
+    <div id="alert-container" class="" style="z-index: 9999">
+    </div>
     <div class="seccion d-flex flex-row w-100 gap-4 mb-4">
-        <a class="stakeholder w-50 seccion d-flex flex-row gap-4 align-items-center justify-content-center" asp-controller="Acceso" asp-action="Stakeholders_Cliente">
+        <a class="stakeholder w-50 seccion d-flex flex-row gap-4 align-items-center justify-content-center"
+            asp-controller="Acceso" asp-action="Stakeholders_Cliente">
             <h1 class="titulo">Clientes</h1>
         </a>
         <div class="stakeholder w-50 seccion d-flex flex-row gap-4 align-items-center justify-content-center selected">
@@ -43,13 +47,16 @@
                     <td>@p.Correo</td>
                     <td>@(p.estado ? "Activo" : "Inactivo")</td>
                     <td>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditar-@p.IdProovedor">Editar</button>
-                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar-@p.IdProovedor">Eliminar</button>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                            data-bs-target="#modalEditar-@p.IdProovedor">Editar</button>
+                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#modalEliminar-@p.IdProovedor">Eliminar</button>
                     </td>
                 </tr>
 
                 <!-- Modal Editar -->
-                <div class="modal fade" id="modalEditar-@p.IdProovedor" tabindex="-1" aria-labelledby="modalEditarLabel-@p.IdProovedor" aria-hidden="true">
+                <div class="modal fade" id="modalEditar-@p.IdProovedor" tabindex="-1"
+                    aria-labelledby="modalEditarLabel-@p.IdProovedor" aria-hidden="true">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <form asp-controller="Acceso" asp-action="EditarProovedor" method="post">
@@ -61,7 +68,8 @@
                                     <input type="hidden" name="IdProovedor" value="@p.IdProovedor" />
                                     <div class="col-md-6">
                                         <label class="form-label">Razón Social</label>
-                                        <input type="text" name="RazonSocial" class="form-control" value="@p.RazonSocial" required />
+                                        <input type="text" name="RazonSocial" class="form-control" value="@p.RazonSocial"
+                                            required />
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">RUC</label>
@@ -83,13 +91,15 @@
                                         <label class="form-label">Estado</label>
                                         <select name="estado" class="form-select">
                                             <option value="true" selected="@(p.estado ? "selected" : null)">Activo</option>
-                                            <option value="false" selected="@(!p.estado ? "selected" : null)">Inactivo</option>
+                                            <option value="false" selected="@(!p.estado ? "selected" : null)">Inactivo
+                                            </option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn-success">Guardar cambios</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
                                 </div>
                             </form>
                         </div>
@@ -97,7 +107,8 @@
                 </div>
 
                 <!-- Modal Eliminar -->
-                <div class="modal fade" id="modalEliminar-@p.IdProovedor" tabindex="-1" aria-labelledby="modalEliminarLabel-@p.IdProovedor" aria-hidden="true">
+                <div class="modal fade" id="modalEliminar-@p.IdProovedor" tabindex="-1"
+                    aria-labelledby="modalEliminarLabel-@p.IdProovedor" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <form asp-controller="Acceso" asp-action="ConfirmarEliminarProovedor" method="post">
@@ -107,11 +118,13 @@
                                 </div>
                                 <div class="modal-body">
                                     <input type="hidden" name="IdProovedor" value="@p.IdProovedor" />
-                                    <p>¿Estás seguro de que deseas eliminar al proveedor <strong>@p.RazonSocial</strong>?</p>
+                                    <p>¿Estás seguro de que deseas eliminar al proveedor <strong>@p.RazonSocial</strong>?
+                                    </p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
                                 </div>
                             </form>
                         </div>
@@ -121,6 +134,45 @@
         </tbody>
     </table>
 </main>
+@section Scripts {
+    <script>
+        // Mostrar alertas solo si existen en TempData
+        $(function () {
+            @if (TempData["Error"] != null)
+                {
+                    <text>
+                        showAlert('@TempData["Error"]', 'danger');
+                    </text>
+                // Limpiar TempData después de mostrarlo
+                    TempData.Remove("Error");
+                }
+
+                @if (TempData["Success"] != null)
+                {
+                    <text>
+                        showAlert('@TempData["Success"]', 'success');
+                    </text>
+                // Limpiar TempData después de mostrarlo
+                    TempData.Remove("Success");
+                }
+
+                function showAlert(message, type) {
+                    const alert = `
+                                        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                                            ${message}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>`;
+
+                    $('#alert-container').append(alert);
+
+                    // Auto-ocultar después de 5 segundos
+                    setTimeout(() => {
+                        $('.alert').alert('close');
+                    }, 5000);
+                }
+        });
+    </script>
+}
 
 <!-- Modal Crear -->
 <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="modalCrearLabel" aria-hidden="true">
