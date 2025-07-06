@@ -33,13 +33,13 @@ namespace EMSI_Corporation.Controllers
             ctVM.cliente = _appDBContext.Clientes.Find(ctVM.clienteID);
             ctVM.empleado = _appDBContext.empleados.Find(ctVM.empleadoID);
             //ViewBag.cliente_trabajador = ctVM;
-            if (ctVM.TipoServicio == "Mantenimiento") {
-                return RedirectToAction("Registrar","Mantenimiento",ctVM);
+            if (ctVM.TipoServicio == "Mantenimiento")
+            {
+                return RedirectToAction("Registrar", "Mantenimiento", ctVM);
             }
             else
             {
-                return View();
-
+                return RedirectToAction("Registrar", "Recarga", ctVM);
             }
         }
     }

@@ -251,6 +251,9 @@ namespace EMSI_Corporation.Data
                 tb.HasOne(r => r.Empleado)
                     .WithMany()
                     .HasForeignKey(r => r.Empleado_ID);
+                tb.HasOne(m => m.ReporteServicio)
+                    .WithMany()
+                    .HasForeignKey(m => m.ReporteServicio_ID).OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<ReporteServicio>(tb =>
@@ -266,12 +269,8 @@ namespace EMSI_Corporation.Data
                     .HasForeignKey(rs => rs.Cliente_ID);
 
                 tb.HasOne(rs => rs.ComprobanteServicio)
-        .WithMany()
-        .HasForeignKey(rs => rs.Comprobante_ID);
-
-                tb.HasOne(rs => rs.Recarga)
-        .WithMany()
-        .HasForeignKey(rs => rs.Recarga_ID).OnDelete(DeleteBehavior.NoAction);
+                .WithMany()
+                .HasForeignKey(rs => rs.Comprobante_ID);
             });
 
             modelBuilder.Entity<Recepcion>(tb =>

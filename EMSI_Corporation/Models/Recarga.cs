@@ -20,5 +20,8 @@ namespace EMSI_Corporation.Models
         [ForeignKey("Empleado")]
         public int Empleado_ID { get; set; }
         public Empleado Empleado { get; set; }
+        [ForeignKey("ReporteServicio")]
+        public int ReporteServicio_ID { get; set; }
+        public ReporteServicio ReporteServicio { get; set; }
     }
 }

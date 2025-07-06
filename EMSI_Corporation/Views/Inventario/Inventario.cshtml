@@ -7,6 +7,15 @@
 <div class="container mt-5">
     <div class="card shadow-lg">
         <div class="card-header text-white" style="background: linear-gradient(90deg, #dc3545, #8b0000);">
+            <a class="btn btn-sm btn-warning" asp-controller="Servicio" asp-action="SeleccionClienteTrabajador">
+                Registrar servicio
+            </a>
+            <a class="btn btn-sm btn-warning" asp-controller="Mantenimiento" asp-action="Index">
+                Ver mantenimientos
+            </a>
+            <a class="btn btn-sm btn-warning" asp-controller="Recarga" asp-action="Index">
+                Ver recargas
+            </a>
             <h3 class="mb-0">Inventario de Extintores</h3>
         </div>
         <div class="card-body">
@@ -23,7 +32,6 @@
                                 <th>Cantidad Disponible</th>
                                 <th>Fecha de Vencimiento</th>
                                 <th>Estado</th>
-                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -51,11 +59,6 @@
                                         {
                                             <span class="badge bg-secondary">@ext.Estado</span>
                                         }
-                                    </td>
-                                    <td>
-                                        <a class="btn btn-sm btn-warning" asp-controller="Mantenimiento" asp-action="Index" asp-route-id="@ext.IdExtintor">
-                                            Ver mantenimientos
-                                        </a>
                                     </td>
                                 </tr>
                             }
