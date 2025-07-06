@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EMSI_Corporation.Controllers
 {
+
     public class VentaController : Controller
     {
         private readonly AppDBContext _appDBContext;

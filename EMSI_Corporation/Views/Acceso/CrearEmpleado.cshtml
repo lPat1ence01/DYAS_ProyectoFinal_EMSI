@@ -3,8 +3,32 @@
 *@
 @{
 }
+@if (ViewBag.Roles == null)
+{
+    <p class="text-danger">No se cargaron los roles.</p>
+}
+else
+{
+    <p class="text-success">Roles cargados: @((ViewBag.Roles as List<EMSI_Corporation.Models.Rol>).Count)</p>
+}
 
 @model EMSI_Corporation.ViewModels.EmpleadoRegistroVM
+@{
+    var roles = ViewBag.Roles as List<EMSI_Corporation.Models.Rol>;
+
+    if (roles == null)
+    {
+        <div class="alert alert-danger">❌ ViewBag.Roles es null</div>
+    }
+    else if (!roles.Any())
+    {
+        <div class="alert alert-warning">⚠️ ViewBag.Roles está vacío</div>
+    }
+    else
+    {
+        <div class="alert alert-success">✅ Se cargaron @roles.Count rol(es).</div>
+    }
+}
 
 @{
     ViewData["Title"] = "Registrar Empleado";
@@ -12,7 +36,7 @@
 }
 
 <h2 class="mb-4">Registrar Nuevo Empleado</h2>
-
+<h2 style="color: red;">ESTA ES LA VISTA CORRECTA DE CREAR EMPLEADO</h2>
 <form asp-action="CrearEmpleado" method="post" class="row g-3">
 
     <div class="col-md-6">
@@ -51,7 +75,16 @@
         <label class="form-label">Contraseña</label>
         <input asp-for="Password" type="password" class="form-control" required />
     </div>
-
+    <div class="col-md-6">
+        <label class="form-label">Rol de Empleado</label>
+        <select asp-for="IdRol" class="form-control" required>
+            <option value="">-- Seleccionar rol --</option>
+            @foreach (var rol in ViewBag.Roles)
+            {
+                <option value="@rol.IdRol">@rol.nomRol</option>
+            }
+        </select>
+    </div>
     <div class="col-12">
         <button type="submit" class="btn btn-success mt-3">Registrar Empleado</button>
     </div>

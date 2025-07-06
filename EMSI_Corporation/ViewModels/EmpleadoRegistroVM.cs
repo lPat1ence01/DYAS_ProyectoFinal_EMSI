@@ -12,5 +12,7 @@
         // Datos del Usuario
         public string Usuario { get; set; }
         public string Password { get; set; }
+        public int IdRol { get; set; }
+
     }
 }

@@ -24,6 +24,11 @@
         public Usuario usuario { get; set; }
 
     -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            ...
+        </table>
+    </div>
     <table class="table table-striped">
         <thead class="table-dark">
             <tr>
@@ -33,13 +38,8 @@
                 <th>DNI</th>
                 <th>Correo</th>
                 <th>Teléfono</th>
-                @if (Model != null && Model.FindAll(e => e.usuario != null).Count > 0)
-                {
-                    <th>Nombre de usuario</th>
-                    <th>Contraseña</th>
-                    <th>Acciones</th>
-                }
-
+                <th>Nombre de usuario</th>
+                <th>Rol</th>
             </tr>
         </thead>
         <tbody>
@@ -56,8 +56,7 @@
                     @if (p.usuario != null)
                     {
                         <td>@p.usuario.usuario</td>
-                        <td>@p.usuario.password</td>
-                        <td>@p.usuario.UserRoles.ElementAt(0)</td>
+                        <td>@(p.usuario.UserRoles.FirstOrDefault()?.Rol?.nomRol ?? "Sin rol")</td>
                     }
                     <td>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
@@ -184,7 +183,7 @@
 
 <!-- Modal Crear -->
 <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="modalCrearLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog">
         <div class="modal-content">
             <form asp-controller="Acceso" asp-action="CrearEmpleado" method="post">
                 <div class="modal-header">
@@ -222,6 +221,16 @@
                     <div class="col-md-6">
                         <label class="form-label">Contraseña</label>
                         <input type="password" name="password" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Rol de Empleado</label>
+                        <select name="IdRol" class="form-control" required>
+                            <option value="">-- Seleccionar rol --</option>
+                            @foreach (var rol in (ViewBag.Roles as List<EMSI_Corporation.Models.Rol>) ?? new List<EMSI_Corporation.Models.Rol>())
+                            {
+                                <option value="@rol.IdRol">@rol.nomRol</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">

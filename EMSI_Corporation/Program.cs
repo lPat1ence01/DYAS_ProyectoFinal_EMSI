@@ -16,40 +16,46 @@ builder.Services.AddDbContext<AppDBContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL"));
 });
-// Asegúrate de tener esto arriba
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/Acceso/Login";
-        options.AccessDeniedPath = "/Acceso/Denegado"; // opcional, si tienes página de acceso denegado
+        options.AccessDeniedPath = "/Acceso/Denegado";
     });
 
 var app = builder.Build();
+
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDBContext>();
 
     // Aplicar migraciones pendientes
-    context.Database.EnsureCreated(); // o context.Database.Migrate();
+    context.Database.EnsureCreated();
 
-    // Verificar si ya hay usuarios
+    // Crear roles fijos si no existen
+    var rolesFijos = new List<Rol>
+    {
+        new Rol { nomRol = "Administrador", Descripcion = "Acceso total" },
+        new Rol { nomRol = "Supervisor", Descripcion = "Mismas funciones que administrador" },
+        new Rol { nomRol = "Atencion cliente", Descripcion = "Acceso a ventas, proveedores, calendario, productos y clientes" },
+        new Rol { nomRol = "Almacenero", Descripcion = "Acceso a operaciones, registro de mantenimiento y calendario" }
+    };
+
+    foreach (var rol in rolesFijos)
+    {
+        if (!context.Roles.Any(r => r.nomRol == rol.nomRol))
+        {
+            context.Roles.Add(rol);
+        }
+    }
+    context.SaveChanges();
+
+    // Crear solo el usuario admin si no hay usuarios
     if (!context.usuarios.Any())
     {
-        // Crear roles si no existen
-        if (!context.Roles.Any())
-        {
-            context.Roles.AddRange(
-                new Rol { nomRol = "Administrador", Descripcion = "Acceso total" },
-                new Rol { nomRol = "Empleado", Descripcion = "Acceso limitado" }
-            );
-            context.SaveChanges();
-        }
-
         var hasher = new PasswordHasher<Usuario>();
 
-
-        // Empleados relacionados
         var adminEmpleado = new Empleado
         {
             nomEmpleado = "Admin",
@@ -59,16 +65,7 @@ using (var scope = app.Services.CreateScope())
             numCelular = "999999999"
         };
 
-        var empleadoEmpleado = new Empleado
-        {
-            nomEmpleado = "Empleado",
-            apeEmpleado = "Demo",
-            dni = "87654321",
-            gmail = "empleado@correo.com",
-            numCelular = "988888888"
-        };
-
-        context.empleados.AddRange(adminEmpleado, empleadoEmpleado);
+        context.empleados.Add(adminEmpleado);
         context.SaveChanges();
 
         var usuarioAdmin = new Usuario
@@ -78,24 +75,16 @@ using (var scope = app.Services.CreateScope())
             IdEmpleado = adminEmpleado.IdEmpleado
         };
 
-        var usuarioEmpleado = new Usuario
-        {
-            usuario = "empleado",
-            password = hasher.HashPassword(null, "Empleado123"),
-            IdEmpleado = empleadoEmpleado.IdEmpleado
-        };
-
-        context.usuarios.AddRange(usuarioAdmin, usuarioEmpleado);
+        context.usuarios.Add(usuarioAdmin);
         context.SaveChanges();
 
-        // Asignar roles
         var rolAdmin = context.Roles.First(r => r.nomRol == "Administrador");
-        var rolEmpleado = context.Roles.First(r => r.nomRol == "Empleado");
 
-        context.UserRoles.AddRange(
-            new User_Rol { IdUsuario = usuarioAdmin.IdUsuario, IdRol = rolAdmin.IdRol },
-            new User_Rol { IdUsuario = usuarioEmpleado.IdUsuario, IdRol = rolEmpleado.IdRol }
-        );
+        context.UserRoles.Add(new User_Rol
+        {
+            IdUsuario = usuarioAdmin.IdUsuario,
+            IdRol = rolAdmin.IdRol
+        });
 
         context.SaveChanges();
     }

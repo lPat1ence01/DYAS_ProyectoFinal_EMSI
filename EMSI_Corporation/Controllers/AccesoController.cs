@@ -516,142 +516,151 @@ namespace EMSI_Corporation.Controllers
         [HttpGet]
         public IActionResult Stakeholders_Empleado()
         {
-            var lista = _appDBContext.empleados?.ToList();
+            ViewBag.Roles = _appDBContext.Roles.ToList();
+            var lista = _appDBContext.empleados?
+                .Include(e => e.usuario)
+                .ThenInclude(u => u.UserRoles)
+                .ThenInclude(ur => ur.Rol)
+                .ToList();
+
             return View(lista);
         }
 
-        //Crear
         [HttpGet]
         public IActionResult CrearEmpleado()
         {
+            ViewBag.Roles = _appDBContext.Roles.ToList();  // Muy importante
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CrearEmpleado(IFormCollection form)
+        public IActionResult CrearEmpleado(EmpleadoRegistroVM model)
         {
-            //remover las alertas para que no aparezcan al cargar la página
             TempData.Remove("Error");
             TempData.Remove("Success");
 
-            //convertir los datos a string para validacion
-            string nomEmpleado2 = form["nomEmpleado"];
-            string apeEmpleado2 = form["apeEmpleado"];
-            string dni2 = form["dni"];
-            string gmail2 = form["gmail"];
-            string numCelular2 = form["numCelular"];
-            //guardar los datos del usaurio para validacion
-            string usuario2 = form["usuario"];
-            string password2 = form["password"];
-            // Normalizar el nombre de usuario
-            usuario2 = usuario2.Trim();
-
-            // Validaciones usando las variables string anteriormente seteadas
-            if (string.IsNullOrWhiteSpace(nomEmpleado2) || nomEmpleado2.Length > 100 || int.TryParse(nomEmpleado2, out _))
+            // Validación de rol
+            if (model.IdRol == 0 || !_appDBContext.Roles.Any(r => r.IdRol == model.IdRol))
             {
-                TempData["Error"] = "El Nombre es Inválido, introduce un apellido válido";
-                return RedirectToAction("Stakeholders_Empleado");
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
             }
 
-            else if (string.IsNullOrWhiteSpace(apeEmpleado2) || apeEmpleado2.Length > 100 || int.TryParse(apeEmpleado2, out _))
+            // Validaciones personalizadas
+            if (string.IsNullOrWhiteSpace(model.NomEmpleado) || model.NomEmpleado.Length > 100 || int.TryParse(model.NomEmpleado, out _))
             {
-                TempData["Error"] = "El Apellido es Inválido, introduce un apellido válido";
-                return RedirectToAction("Stakeholders_Empleado");
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
             }
 
-            else if (string.IsNullOrWhiteSpace(dni2) || dni2.Length != 8 || !dni2.All(char.IsDigit))
+            if (string.IsNullOrWhiteSpace(model.ApeEmpleado) || model.ApeEmpleado.Length > 100 || int.TryParse(model.ApeEmpleado, out _))
             {
-                TempData["Error"] = "La longitud del DNI tiene que ser de 8 digitos";
-                return RedirectToAction("Stakeholders_Empleado");
-            }
-            // Verifica si el DNI del empleado ya lo tiene otro empleado.
-            else if (_appDBContext.empleados.Any(E => E.dni == dni2))
-            {
-                TempData["Error"] = "El DNI ingresado ya está registrado.";
-                return RedirectToAction("Stakeholders_Empleado");
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
             }
 
-            else if (string.IsNullOrWhiteSpace(gmail2) || gmail2.Length > 100)
+            if (string.IsNullOrWhiteSpace(model.DNI) || model.DNI.Length != 8 || !model.DNI.All(char.IsDigit))
             {
-                TempData["Error"] = "Correo Inválido";
-                return RedirectToAction("Stakeholders_Empleado");
-            }
-            // Verifica si el CORREO del empleado ya lo tiene otro empleado.
-            else if (_appDBContext.empleados.Any(E => E.gmail == gmail2))
-            {
-                TempData["Error"] = "El CORREO ingresado ya está registrado.";
-                return RedirectToAction("Stakeholders_Empleado");
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
             }
 
-            else if (string.IsNullOrWhiteSpace(numCelular2) || numCelular2.Length > 10 || !numCelular2.All(char.IsDigit))
+            if (_appDBContext.empleados.Any(e => e.dni == model.DNI))
             {
-                TempData["Error"] = "Número Inválido, demasiado largo.";
-                return RedirectToAction("Stakeholders_Empleado");
-            }
-            // Verifica si el CELULAR del empleado ya lo tiene otro empleado.
-            else if (_appDBContext.empleados.Any(E => E.numCelular == numCelular2))
-            {
-                TempData["Error"] = "El NÚMERO ingresado ya está registrado.";
-                return RedirectToAction("Stakeholders_Empleado");
-            }
-            else if (string.IsNullOrWhiteSpace(usuario2) || usuario2.Length > 100)
-            {
-                TempData["Error"] = "Usuario Inválido";
-                return RedirectToAction("Stakeholders_Empleado");
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
             }
 
-            else if (string.IsNullOrWhiteSpace(password2) || password2.Length > 100)
+            if (string.IsNullOrWhiteSpace(model.Gmail) || model.Gmail.Length > 100)
             {
-                TempData["Error"] = "Contraseña Inválida, muy grande";
-                return RedirectToAction("Stakeholders_Empleado");
-            }
-            // Verifica si el NOMBRE DE USUARIO del USUARIO ya lo tiene otro USUARIO.
-            else if (_appDBContext.usuarios.Any(U => U.usuario == usuario2))
-            {
-                TempData["Error"] = "El NOMBRE DE USUARIO ingresado ya está registrado.";
-                return RedirectToAction("Stakeholders_Empleado");
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
             }
 
-            // Seteamos los datos anteriormente validados para el empleado
+            if (_appDBContext.empleados.Any(e => e.gmail == model.Gmail))
+            {
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
+            }
+
+            if (string.IsNullOrWhiteSpace(model.NumCelular) || model.NumCelular.Length > 10 || !model.NumCelular.All(char.IsDigit))
+            {
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
+            }
+
+            if (_appDBContext.empleados.Any(e => e.numCelular == model.NumCelular))
+            {
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Usuario) || model.Usuario.Length > 100)
+            {
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
+            }
+
+            if (_appDBContext.usuarios.Any(u => u.usuario == model.Usuario))
+            {
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Password) || model.Password.Length > 100)
+            {
+                TempData["Error"] = "Selecciona un rol válido.";
+                ViewBag.Roles = _appDBContext.Roles.ToList();
+                return View("CrearEmpleado", model);
+            }
+
+            // Crear Empleado
             var empleado = new Empleado
             {
-                nomEmpleado = nomEmpleado2,
-                apeEmpleado = apeEmpleado2,
-                dni = dni2,
-                gmail = gmail2,
-                numCelular = numCelular2
+                nomEmpleado = model.NomEmpleado,
+                apeEmpleado = model.ApeEmpleado,
+                dni = model.DNI,
+                gmail = model.Gmail,
+                numCelular = model.NumCelular
             };
-            //guardamos :p
             _appDBContext.empleados.Add(empleado);
             _appDBContext.SaveChanges();
 
-            // Seteamos los datos anteriormente validados para el usuario
+            // Crear Usuario
             var usuario = new Usuario
             {
-                usuario = usuario2,
-                password = new PasswordHasher<Usuario>().HashPassword(null, password2),
+                usuario = model.Usuario,
+                password = new PasswordHasher<Usuario>().HashPassword(null, model.Password),
                 IdEmpleado = empleado.IdEmpleado
             };
-            //guardamos :p
             _appDBContext.usuarios.Add(usuario);
             _appDBContext.SaveChanges();
 
-            // Asignar el rol automáticamente (Empleado)
-            var rolEmpleado = _appDBContext.Roles.FirstOrDefault(r => r.nomRol == "Empleado");
-            if (rolEmpleado != null)
+            // Asignar Rol
+            _appDBContext.UserRoles.Add(new User_Rol
             {
-                _appDBContext.UserRoles.Add(new User_Rol
-                {
-                    IdUsuario = usuario.IdUsuario,
-                    IdRol = rolEmpleado.IdRol
-                });
-                _appDBContext.SaveChanges();
-            }
+                IdUsuario = usuario.IdUsuario,
+                IdRol = model.IdRol
+            });
+            _appDBContext.SaveChanges();
 
             TempData["Success"] = "Empleado registrado correctamente.";
             return RedirectToAction("Stakeholders_Empleado");
         }
+
+
 
 
         //Editar
