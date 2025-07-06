@@ -29,6 +29,7 @@ namespace EMSI_Corporation.Data
         public DbSet<ReporteServicio> ReportesServicio { get; set; }
         public DbSet<Recepcion> Recepcion { get; set; }
         public DbSet<Proovedor> Provedor { get; set; }
+        public DbSet<EventoCalendario> EventosCalendario { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -80,6 +81,34 @@ namespace EMSI_Corporation.Data
                 tb.Property(r => r.IdRol).UseIdentityColumn().ValueGeneratedOnAdd();
                 tb.Property(r => r.nomRol).HasMaxLength(50).IsRequired();
                 tb.Property(r => r.Descripcion).HasMaxLength(250).IsRequired();
+            });
+            modelBuilder.Entity<EventoCalendario>(tb =>
+            {
+                tb.HasKey(e => e.IdEvento);
+                tb.Property(e => e.IdEvento)
+                    .UseIdentityColumn()
+                    .ValueGeneratedOnAdd();
+
+                tb.Property(e => e.Titulo)
+                    .HasMaxLength(150)
+                    .IsRequired();
+
+                tb.Property(e => e.Descripcion)
+                    .HasMaxLength(500);
+
+                tb.Property(e => e.FechaInicio)
+                    .IsRequired();
+
+                tb.Property(e => e.FechaFin)
+                    .IsRequired(false);
+
+                tb.Property(e => e.Color)
+                    .HasMaxLength(20);
+
+                tb.HasOne(e => e.Empleado)
+                    .WithMany()
+                    .HasForeignKey(e => e.EmpleadoId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Rol_Menu>(tb =>
