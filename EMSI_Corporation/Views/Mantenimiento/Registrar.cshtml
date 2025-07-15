@@ -7,6 +7,7 @@
     Extintor? extintor = null;
 
     var total = 0.0;
+    int i = 0;
 }
 
 <main>
@@ -49,40 +50,45 @@
             }
             
 
+            <div class="table-responsive">
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Id</th>
-                        <th scope="col">Empleado a cargo</th>
-                        <th scope="col">ID Extintor</th>
-                        <th scope="col">Ha sido usado?</th>
-                        <th scope="col">Está visible?</th>
-                        <th scope="col">% de validez</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    @foreach (var mant in mantenimientos)
-                    {
-                        var suma = (mant.AperturaCorrecta ? 1 : 0) + (mant.BarometroCorrecto ? 1 : 0) + (mant.Señalización ? 1 : 0) + (mant.InstruccionesVisibles ? 1 : 0) + (mant.BoquillaCorrecta ? 1 : 0) + (mant.EstadoIndicador ? 1 : 0) + (mant.EstadoPrecinto ? 1 : 0) + (mant.ExteriorCorrecto ? 1 : 0) + (mant.LugarAdecuado ? 1 : 0) + (mant.MangueraCorrecta ? 1 : 0) + (mant.PesoCorrecto ? 1 : 0) + (mant.PresionCorrecta ? 1 : 0);
-                        double per = (double)suma * 100 / 12.00;
-                        per = Math.Round(per, 2);
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <th scope="row">@mant.IdMantenimiento</th>
-                            <td>@cliente_trabajador.empleado.nomEmpleado</td>
-                            <td>@mant.Extintor_ID</td>
-                            <td>@mant.Usado</td>
-                            <td>@mant.Visible</td>
-                            <td>@per</td>
-                            <td></td>
+                            <th scope="col">Id</th>
+                            <th scope="col">Empleado a cargo</th>
+                            <th scope="col">ID Extintor</th>
+                            <th scope="col">Ha sido usado?</th>
+                            <th scope="col">Está visible?</th>
+                            <th scope="col">% de validez</th>
+                            <th scope="col">Acciones</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var mant in mantenimientos)
+                        {
+                            var suma = (mant.AperturaCorrecta ? 1 : 0) + (mant.BarometroCorrecto ? 1 : 0) + (mant.Señalización ? 1 : 0) + (mant.InstruccionesVisibles ? 1 : 0) + (mant.BoquillaCorrecta ? 1 : 0) + (mant.EstadoIndicador ? 1 : 0) + (mant.EstadoPrecinto ? 1 : 0) + (mant.ExteriorCorrecto ? 1 : 0) + (mant.LugarAdecuado ? 1 : 0) + (mant.MangueraCorrecta ? 1 : 0) + (mant.PesoCorrecto ? 1 : 0) + (mant.PresionCorrecta ? 1 : 0);
+                            double per = (double)suma * 100 / 12.00;
+                            per = Math.Round(per, 2);
+                            <tr>
+                                <th scope="row">@mant.IdMantenimiento</th>
+                                <td>@cliente_trabajador.empleado.nomEmpleado</td>
+                                <td>@mant.Extintor_ID</td>
+                                <td>@mant.Usado</td>
+                                <td>@mant.Visible</td>
+                                <td>@per</td>
+                                <td><a asp-controller="Mantenimiento" asp-action="Borrar" asp-route-i=@i class="w-50 h-25 bg-danger d-flex flex-row align-items-center justify-content-center text-white rounded-3">X</a></td>
+                            </tr>
+                            i++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
             <p id="subtotalLabel">Total:</p>
-            <a asp-controller="Mantenimiento" asp-action="DescargarExcel" class="btn btn-primary">Descargar Excel</a>
+            
+            <a asp-controller="Mantenimiento" asp-action="DescargarExcel" class="btn btn-primary" id=@(mantenimientos.Count > 0?"btn-enabled-link":"btn-disabled-link")>Descargar Excel</a>
+            
         </div>
 
         <div class="seccion sec-mant-observaciones">
@@ -95,12 +101,15 @@
             <p>Firma cliente</p>
             <canvas id="myCanvas" width="200" height="100" style="border:1px solid black;"></canvas>
             <div class="canvas-btns">
-                <button id="canvas-clear" class="">del</button>
-                <button id="canvas-save" class="">save</button>
+                <div id="canvas-clear" class="">del</div>
+                <div id="canvas-save" class="">save</div>
             </div>
 
+        </div>
+        <div id="submit-btn" class="w-100 d-flex flex-row align-items-center justify-content-center">
             <button type="submit" class="btn-1">Añadir</button>
         </div>
+        
     </form>
 </main>
 

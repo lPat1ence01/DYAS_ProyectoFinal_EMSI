@@ -148,6 +148,31 @@ namespace EMSI_Corporation.Controllers
             ViewBag.cliente_trabajador = ct;
             return View("Registrar");
         }
+        [HttpGet]
+        public IActionResult Borrar(int i)
+        {
+            Mantenimiento borrado = mantenimientos_[i];
+            List<Mantenimiento> lista = new List<Mantenimiento>();
+            for (int j = 0; j < mantenimientos_.Count; j++)
+            {
+                if (j == i) continue;
+                lista.Add(mantenimientos_[j]);
+            }
+            mantenimientos_ = lista;
+            ViewBag.extintores = _appDBContext.Extintores.ToList();
+            borrado.Extintor = _appDBContext.Extintores.Find(borrado.Extintor_ID);
+            Venta ven = _appDBContext.Ventas.Find(borrado.Extintor.Venta_ID);
+            ClienteTrabajadorVM ct = new ClienteTrabajadorVM
+            {
+                cliente = _appDBContext.Clientes.Find(ven.Cliente_ID),
+                clienteID = ven.Cliente_ID,
+                empleado = _appDBContext.empleados.Find(ven.Empleado_ID),
+                empleadoID = ven.Empleado_ID
+            };
+            ViewBag.mantenimientos = mantenimientos_;
+            ViewBag.cliente_trabajador = ct;
+            return View("Registrar");
+        }
 
         [HttpGet]
         public FileResult DescargarExcel()

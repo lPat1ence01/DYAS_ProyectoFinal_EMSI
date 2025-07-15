@@ -8,13 +8,20 @@ body {
     width: 100%;
 }
 
+#btn-disabled-link {
+    pointer-events: none;
+    background-color: dimgray;
+    border: none;
+    outline: none;
+}
+
 .canvas-btns {
     display: flex;
     flex-direction: row;
     gap: .5rem;
 }
 
-.canvas-btns > button {
+.canvas-btns > div {
     width: 50%;
     height: 3rem;
     color: white;
@@ -22,9 +29,12 @@ body {
     border-radius: .5rem;
     cursor: pointer;
     transition: all 200ms ease;
+    display: flex;
+    align-items:center;
+    justify-content: center;    
 }
 
-.canvas-btns > button:hover {
+.canvas-btns > div:hover {
     filter: brightness(70%);
     transition: all 200ms ease;
 }
@@ -40,7 +50,7 @@ body {
 .mantenimiento {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: 10fr 1fr;
     gap: 2em;
 }
 
@@ -48,16 +58,12 @@ body {
     grid-area: 1 / 1 / span 1 / span 1;
 }
 
-.sec-mant-datos {
-    grid-area: 3 / 1 / span 4 / span 1;
-}
-
 .sec-mant-observaciones {
     grid-area: 1 / 2 / span 1 / span 1;
 }
 
-.sec-mant-excel {
-    grid-area: 4 / 2 / span 3 / span 1;
+#submit-btn {
+    grid-area: 2 / 1 / span 1 / span 2;
 }
 
 canvas {
