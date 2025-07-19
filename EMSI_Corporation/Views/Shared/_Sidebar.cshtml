@@ -15,11 +15,12 @@
         </div>
         <ul class="sidebar-nav">
             <li class="sidebar-item">
-                <a href="#" class="sidebar-link">
+                <a asp-controller="Cuenta" asp-action="Perfil" class="sidebar-link">
                     <i class="lni lni-user"></i>
-                    <span>Profile</span>
+                    <span>Perfil</span>
                 </a>
             </li>
+
             <!-- Empleados -->
             <li class="sidebar-item">
                 <a asp-controller="Acceso" asp-action="Stakeholders_Empleado" class="sidebar-link">
@@ -27,28 +28,29 @@
                     <span>Empleados</span>
                 </a>
             </li>
-            <!-- Productos -->
+            <!-- Productos (Operaciones) -->
             <li class="sidebar-item">
-                <a href="#" class="sidebar-link has-dropdown collapsed" data-bs-toggle="collapse" data-bs-target="#auth" aria-expanded="false" aria-controls="auth">
+                <a href="#" class="sidebar-link has-dropdown collapsed" data-bs-toggle="collapse" data-bs-target="#operaciones" aria-expanded="false" aria-controls="operaciones">
                     <i class="lni lni-protection"></i>
                     <span>Operaciones</span>
                 </a>
-                <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                <ul id="operaciones" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                     <li class="sidebar-item">
-                        <a asp-controller="Recepcion" asp-action="Index" class="sidebar-link">Recepcion</a>
+                        <a asp-controller="Recepcion" asp-action="Index" class="sidebar-link">Recepción</a>
                     </li>
                     <li class="sidebar-item">
                         <a asp-controller="Inventario" asp-action="Inventario" class="sidebar-link">Inventario</a>
                     </li>
                 </ul>
             </li>
-            <!-- Proveedores y Clientes -->
+
+            <!-- Socios -->
             <li class="sidebar-item">
-                <a asp-controller="Acceso" asp-action="Stakeholders" class="sidebar-link has-dropdown collapsed" data-bs-toggle="collapse" data-bs-target="#auth" aria-expanded="false" aria-controls="auth">
+                <a href="#" class="sidebar-link has-dropdown collapsed" data-bs-toggle="collapse" data-bs-target="#socios" aria-expanded="false" aria-controls="socios">
                     <i class="lni lni-network"></i>
                     <span>Socios</span>
                 </a>
-                <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                <ul id="socios" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                     <li class="sidebar-item">
                         <a asp-controller="Acceso" asp-action="Stakeholders_Proovedor" class="sidebar-link">
                             <i class="lni lni-delivery"></i> Proveedores
@@ -62,7 +64,6 @@
                 </ul>
             </li>
 
-            
             <li class="sidebar-item">
                 <a asp-controller="Venta" asp-action="Index" class="sidebar-link">
                     <i class="lni lni-popup"></i>
@@ -72,7 +73,7 @@
             <li class="sidebar-item">
                 <a asp-controller="Servicio" asp-action="SeleccionClienteTrabajador" class="sidebar-link">
                     <i class="lni lni-popup"></i>
-                    <span>Registrar Reporte de mantenimiento</span>
+                    <span>Reporte técnico</span>
                 </a>
             </li>
             <li class="sidebar-item">
