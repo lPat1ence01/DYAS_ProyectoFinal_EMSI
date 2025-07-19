@@ -36,6 +36,7 @@ namespace EMSI_Corporation.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Acceso");
         }
+
         [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
@@ -47,10 +48,12 @@ namespace EMSI_Corporation.Controllers
 
             return View();
         }
+
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login(LoginVM modelo)
         {
+            //Valida que los campos contraseñas y usuario esten completados
             if (!ModelState.IsValid)
             {
                 return View(modelo);
@@ -81,9 +84,9 @@ namespace EMSI_Corporation.Controllers
                 ModelState.AddModelError(string.Empty, "Contraseña incorrecta.");
                 return View(modelo);
             }
-
+            //Si el usuario no tiene rol, asigna rol Atención cliente por defecto
             var rolUsuario = usuario.UserRoles.FirstOrDefault()?.Rol?.nomRol ?? "Empleado";
-
+            //DNI Digital
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
@@ -93,19 +96,18 @@ namespace EMSI_Corporation.Controllers
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
+            //Recuerda quien eres
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 
-            return RedirectToAction("Index", "Home"); // Cambia a donde quieras redirigir después del login
+            return RedirectToAction("Index", "Home");
         }
-
-
 
         [HttpGet]
         public IActionResult Mantenimiento()
         {
             return View();
         }
+
         [HttpGet]
         public IActionResult PopupMant()
         {
@@ -529,7 +531,7 @@ namespace EMSI_Corporation.Controllers
         [HttpGet]
         public IActionResult CrearEmpleado()
         {
-            ViewBag.Roles = _appDBContext.Roles.ToList();  // Muy importante
+            ViewBag.Roles = _appDBContext.Roles.ToList();
             return View();
         }
 
@@ -537,96 +539,54 @@ namespace EMSI_Corporation.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CrearEmpleado(EmpleadoRegistroVM model)
         {
-            TempData.Remove("Error");
-            TempData.Remove("Success");
+            ViewBag.Roles = _appDBContext.Roles.ToList();
 
-            // Validación de rol
-            if (model.IdRol == 0 || !_appDBContext.Roles.Any(r => r.IdRol == model.IdRol))
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
-
-            // Validaciones personalizadas
+            // Validaciones de formato
             if (string.IsNullOrWhiteSpace(model.NomEmpleado) || model.NomEmpleado.Length > 100 || int.TryParse(model.NomEmpleado, out _))
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
+                ModelState.AddModelError("NomEmpleado", "El nombre no puede contener números ni estar vacío.");
 
             if (string.IsNullOrWhiteSpace(model.ApeEmpleado) || model.ApeEmpleado.Length > 100 || int.TryParse(model.ApeEmpleado, out _))
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
+                ModelState.AddModelError("ApeEmpleado", "El apellido no puede contener números ni estar vacío.");
 
             if (string.IsNullOrWhiteSpace(model.DNI) || model.DNI.Length != 8 || !model.DNI.All(char.IsDigit))
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
-
-            if (_appDBContext.empleados.Any(e => e.dni == model.DNI))
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
+                ModelState.AddModelError("DNI", "El DNI debe tener 8 dígitos.");
 
             if (string.IsNullOrWhiteSpace(model.Gmail) || model.Gmail.Length > 100)
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
+                ModelState.AddModelError("Gmail", "El correo debe tener el formato 'correo@correo.com'.");
 
-            if (_appDBContext.empleados.Any(e => e.gmail == model.Gmail))
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
-
-            if (string.IsNullOrWhiteSpace(model.NumCelular) || model.NumCelular.Length > 10 || !model.NumCelular.All(char.IsDigit))
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
-
-            if (_appDBContext.empleados.Any(e => e.numCelular == model.NumCelular))
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
+            if (string.IsNullOrWhiteSpace(model.NumCelular) || model.NumCelular.Length != 9 || !model.NumCelular.StartsWith("9") || !model.NumCelular.All(char.IsDigit))
+                ModelState.AddModelError("NumCelular", "El número debe tener 9 dígitos y comenzar con 9.");
 
             if (string.IsNullOrWhiteSpace(model.Usuario) || model.Usuario.Length > 100)
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
-
-            if (_appDBContext.usuarios.Any(u => u.usuario == model.Usuario))
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
+                ModelState.AddModelError("Usuario", "El nombre de usuario no puede contener caracteres especiales.");
 
             if (string.IsNullOrWhiteSpace(model.Password) || model.Password.Length > 100)
-            {
-                TempData["Error"] = "Selecciona un rol válido.";
-                ViewBag.Roles = _appDBContext.Roles.ToList();
-                return View("CrearEmpleado", model);
-            }
+                ModelState.AddModelError("Password", "La contraseña no puede tener más de 100 caracteres.");
 
-            // Crear Empleado
+            if (model.IdRol == 0 || !_appDBContext.Roles.Any(r => r.IdRol == model.IdRol))
+                ModelState.AddModelError("IdRol", "Selecciona un rol válido.");
+
+            // Si hay errores de formato, no consultamos la base de datos aún
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // Validaciones de existencia en base de datos
+            if (_appDBContext.empleados.Any(e => e.dni == model.DNI))
+                ModelState.AddModelError("DNI", "Ya existe un empleado con este DNI.");
+
+            if (_appDBContext.empleados.Any(e => e.gmail == model.Gmail))
+                ModelState.AddModelError("Gmail", "Este correo ya está registrado.");
+
+            if (_appDBContext.empleados.Any(e => e.numCelular == model.NumCelular))
+                ModelState.AddModelError("NumCelular", "Este número de celular ya está registrado.");
+
+            if (_appDBContext.usuarios.Any(u => u.usuario == model.Usuario))
+                ModelState.AddModelError("Usuario", "Este usuario ya está registrado.");
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // Registro
             var empleado = new Empleado
             {
                 nomEmpleado = model.NomEmpleado,
@@ -638,7 +598,6 @@ namespace EMSI_Corporation.Controllers
             _appDBContext.empleados.Add(empleado);
             _appDBContext.SaveChanges();
 
-            // Crear Usuario
             var usuario = new Usuario
             {
                 usuario = model.Usuario,
@@ -648,7 +607,6 @@ namespace EMSI_Corporation.Controllers
             _appDBContext.usuarios.Add(usuario);
             _appDBContext.SaveChanges();
 
-            // Asignar Rol
             _appDBContext.UserRoles.Add(new User_Rol
             {
                 IdUsuario = usuario.IdUsuario,
@@ -656,11 +614,9 @@ namespace EMSI_Corporation.Controllers
             });
             _appDBContext.SaveChanges();
 
-            TempData["Success"] = "Empleado registrado correctamente.";
+            TempData["Success"] = "✅ Empleado registrado correctamente.";
             return RedirectToAction("Stakeholders_Empleado");
         }
-
-
 
 
         //Editar
